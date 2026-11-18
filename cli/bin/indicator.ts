@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Command line of the indicator light generator (docs/generateur.md):
+// Command line of the indicator light generator (docs/generator.md):
 //   indicator check <preset.json> [--json]
 //   indicator generate <preset.json> [-o <dir>] [--json]
 // <dir>: export/ next to the preset by default; preset <name> = name of the files.

@@ -1,38 +1,39 @@
 ---
 name: panel-indicator
-description: Témoins lumineux encastrables imprimés en 3D (légende éclairée par un ruban WS2812B, dans un cadre vissé sur une découpe de panneau) pour n'importe quel projet. Décrit le témoin dans un preset JSON du projet (design/temoin/<nom>.json), le contrôle, produit les fichiers d'impression et de montage (3MF génériques, STL, STEP, nomenclature) avec la commande `indicator`, et sur demande l'intègre dans le design Fusion du projet. À charger pour « fais / génère / vérifie un témoin lumineux, un voyant, une légende éclairée », ou dès qu'un preset de témoin est en jeu.
+description: 3D-printed flush-mount backlit indicators (legend lit by a WS2812B strip, in a frame screwed onto a panel cutout) for any project — témoins lumineux encastrables. Describes the indicator in a JSON preset of the project (design/indicator/<name>.json), checks it, produces the print and mounting files (generic 3MF, STL, STEP, bill of materials) with the `indicator` command, and on request integrates it in the project's Fusion design. Load for “make / generate / check a backlit indicator, an indicator light, a lit legend, an annunciator” or « fais / génère / vérifie un témoin lumineux, un voyant, une légende éclairée », or as soon as an indicator preset is involved.
 ---
 
-# Témoin lumineux
+# Panel indicator
 
-Le calcul est dans la commande `indicator` du générateur : le dépôt dont `skill/` est la cible
-du lien `~/.claude/skills/panel-indicator`.
-Ce skill la pilote depuis le projet hôte et n'écrit que dans ce projet.
+The computation is in the generator's `indicator` command: the repository whose `skill/` is
+the target of the link `~/.claude/skills/panel-indicator`.
+This skill drives it from the host project and only writes in that project. Speak to the
+user in their language; the command's output is in English.
 
-## Commande
+## Command
 
 ```bash
-indicator check <preset.json> --json                  # contrôles seuls, rien n'est écrit
-indicator generate <preset.json> [-o <dossier>] --json # contrôles puis fichiers
+indicator check <preset.json> --json                  # checks only, nothing is written
+indicator generate <preset.json> [-o <dir>] --json    # checks then files
 ```
 
-- Sans `-o` : fichiers dans `export/` à côté du preset ; `<nom>` du fichier preset préfixe tout.
-- Code de sortie : 0 bon (avertissements possibles), 1 preset refusé (erreur), 2 mauvais usage.
-- JSON : `{ name, ok, checks: [{ level: ok|warn|error, code, message }], summary, out, files }` ;
-  `summary` : `capHeight`, `window`, `frame`, `panel`, `cutout` (découpe et trous du panneau),
+- Without `-o`: files in `export/` next to the preset; `<name>` of the preset file prefixes everything.
+- Exit code: 0 good (warnings possible), 1 preset rejected (error), 2 bad usage.
+- JSON: `{ name, ok, checks: [{ level: ok|warn|error, code, message }], summary, out, files }`;
+  `summary`: `capHeight`, `window`, `frame`, `panel`, `cutout` (cutout and holes of the panel),
   `screws`, `inserts`, `leds`.
-- `indicator` introuvable : `cd "$(realpath ~/.claude/skills/panel-indicator)/../cli" && npm link`
-  (Node 22.18 ou plus) ; sinon `node "$(realpath ~/.claude/skills/panel-indicator)/../cli/bin/indicator.ts" …`.
+- `indicator` not found: `cd "$(realpath ~/.claude/skills/panel-indicator)/../cli" && npm link`
+  (Node 22.18 or later); else `node "$(realpath ~/.claude/skills/panel-indicator)/../cli/bin/indicator.ts" …`.
 
 ## Preset (version 1)
 
-Un fichier par témoin, versionné avec le projet hôte : `design/temoin/<nom>.json` par
-défaut, ou le chemin que l'utilisateur donne. Cotes en mm. Toute clé inconnue est refusée.
+One file per indicator, versioned with the host project: `design/indicator/<name>.json` by
+default, or the path the user gives. Dimensions in mm. Any unknown key is rejected.
 
 ```json
 {
   "version": 1,
-  "legend": { "text": "ALARME", "background": "#111111" },
+  "legend": { "text": "ALARM", "background": "#111111" },
   "window": { "width": 27, "height": 10.5 },
   "frame": { "width": 47, "height": 18, "color": "#4b5320" },
   "panel": { "thickness": 3 },
@@ -41,80 +42,81 @@ défaut, ou le chemin que l'utilisateur donne. Cotes en mm. Toute clé inconnue 
 }
 ```
 
-| Clé | Réglage | Par défaut |
+| Key | Setting | Default |
 | --- | --- | --- |
-| `legend.text` | texte d'une ligne (capitales conseillées) | **obligatoire** |
-| `panel.thickness` | épaisseur du panneau hôte | **obligatoire** |
-| `legend.background` | couleur du fond de la légende | `#111111` |
-| `window.width`, `window.height` | partie éclairée visible | 27 × 10,5 |
-| `frame.width`, `frame.height` | cadre, en façade | 47 × 18 |
-| `frame.color` | couleur du cadre | `#111111` |
-| `mount.head` | vis `countersunk` (fraisée, affleurante) ou `socket` (cylindrique, dépasse de 3 ; jamais imprimée) | `countersunk` |
-| `light.wireExit` | sortie des fils, vue de face : `left` ou `right` | `left` |
+| `legend.text` | one-line text (capitals advised) | **required** |
+| `panel.thickness` | thickness of the host panel | **required** |
+| `legend.background` | color of the legend background | `#111111` |
+| `window.width`, `window.height` | visible lit part | 27 × 10.5 |
+| `frame.width`, `frame.height` | frame, on the front | 47 × 18 |
+| `frame.color` | color of the frame | `#111111` |
+| `mount.head` | `countersunk` screws (flush) or `socket` (socket head, sticks out by 3; never printed) | `countersunk` |
+| `light.wireExit` | exit of the wires, seen from the front: `left` or `right` | `left` |
 
-Fixé en v1 (validé à l'impression) : police Barlow Condensed SemiBold, hauteur des lettres
-automatique, lettres lumineuses ; 2 vis M3 et 2 inserts à chaud M3, longueur et entraxe
-calculés ; ruban WS2812B 5 V à 144 LED/m (nombre de LED selon la fenêtre). Hors v1 : 2
-lignes, autre police, M2 ou M2,5, écrous, autre ruban, cadre rond, etc. Le dire, proposer
-le plus proche en v1, ne jamais contourner (clé inventée, fichier retouché).
+Fixed in v1 (validated in print): Barlow Condensed SemiBold font, automatic letter height,
+lit letters; 2 M3 screws and 2 M3 heat-set inserts, length and spacing computed; WS2812B
+5 V strip at 144 LEDs/m (number of LEDs from the window). Outside v1: 2 lines, another
+font, M2 or M2.5, nuts, another strip, round frame, etc. Say so, suggest the closest in
+v1, never work around it (invented key, touched-up file).
 
-## Déroulement
+## Steps
 
-1. **Preset.** Celui du projet (`design/temoin/*.json`, ou le chemin donné). Sinon, en
-   créer un : demander le texte et l'épaisseur du panneau, puis proposer pour le reste la
-   valeur par défaut ou celle que le projet suggère (sa documentation, ses cotes) ;
-   l'écrire après accord.
-2. **Contrôles** : `indicator check <preset> --json`.
-   - `error` : s'arrêter, expliquer, proposer la correction du preset (`mount.frame` donne
-     le plus petit cadre qui passe) ; l'appliquer seulement après accord, puis recontrôler.
-   - `warn` : continuer ; le signaler dans le résumé (les espaces du masque plus fins que la
-     buse sont courants et n'ont pas gêné l'impression).
-3. **Génération** : `indicator generate <preset> --json`.
-4. **Résumé** à l'utilisateur, par exemple :
+1. **Preset.** The project's (`design/indicator/*.json`, or the given path). Else, create
+   one: ask for the text and the panel thickness, then suggest for the rest the default
+   value or the one the project suggests (its documentation, its dimensions); write it
+   after agreement.
+2. **Checks**: `indicator check <preset> --json`.
+   - `error`: stop, explain, suggest the fix of the preset (`mount.frame` gives the
+     smallest frame that passes); apply it only after agreement, then check again.
+   - `warn`: go on; mention it in the summary (mask gaps thinner than the nozzle are
+     common and did not hinder printing).
+3. **Generation**: `indicator generate <preset> --json`.
+4. **Summary** to the user, for example:
 
    ```text
-   Témoin « alarme » (design/temoin/alarme.json)
-   Contrôles : ⚠ espaces du masque plus fins que la buse (4), le reste ✓
-   Nomenclature : 2 vis fraisées M3 × 10, 2 inserts à chaud M3 (perçage Ø 4 × 5,5),
-     4 LED de ruban WS2812B à 144 LED/m (tronçon de 27,8 mm), nappe de 4 fils au pas de 1,27
-   Panneau : découpe 29,8 × 13,3, 2 trous Ø 3,4 à 37 d'entraxe, centrés sur la fenêtre
-   Fichiers : design/temoin/export/ (12 : 3MF, STL, STEP, preset)
-   Valeurs par défaut retenues : fenêtre 27 × 10,5, vis fraisées, fils à gauche
+   Indicator “alarm” (design/indicator/alarm.json)
+   Checks: ⚠ mask gaps thinner than the nozzle (4), the rest ✓
+   Bill of materials: 2 M3 × 10 countersunk screws, 2 M3 heat-set inserts (hole Ø 4 × 5.5),
+     4 WS2812B strip LEDs at 144 LEDs/m (27.8 mm piece), 4-wire ribbon at 1.27 pitch
+   Panel: cutout 29.8 × 13.3, 2 holes Ø 3.4, 37 mm apart, centered on the window
+   Files: design/indicator/export/ (12: 3MF, STL, STEP, preset)
+   Default values used: window 27 × 10.5, countersunk screws, wires on the left
    ```
 
-Fichiers de `export/` (régénérables, jamais retouchés à la main) :
+Files of `export/` (can be regenerated, never touched up by hand):
 
-| Fichier | Contenu |
+| File | Content |
 | --- | --- |
-| `<nom>_legende.3mf` | légende : masque et voile en un objet de 2 couleurs, à imprimer ensemble |
-| `<nom>_cadre.3mf`, `<nom>_boite_fond.3mf` | cadre ; boîte à lumière et fond |
-| `<nom>_panneau_essai.3mf` | morceau de panneau percé, pour essayer le montage |
-| `<nom>_<pièce>.stl` | une par pièce, orientée pour l'impression |
-| `<nom>.step` | assemblage nommé (cadre, masque, voile, boîte, fond) dans le repère du témoin |
-| `<nom>.json` | preset utilisé, valeurs par défaut comprises |
+| `<name>_legend.3mf` | legend: mask and veil in one object of 2 colors, to print together |
+| `<name>_frame.3mf`, `<name>_box_cover.3mf` | frame; light box and cover |
+| `<name>_test_panel.3mf` | piece of drilled panel, to try the mounting |
+| `<name>_<piece>.stl` | one per piece, oriented for printing |
+| `<name>.step` | named assembly (frame, mask, veil, box, cover) in the indicator's frame of reference |
+| `<name>.json` | preset used, default values included |
 
-Les 3MF sont génériques (une pièce par couleur, sans réglage) : l'utilisateur tranche
-lui-même ; ne pas proposer de tranchage.
+The 3MF files are generic (one part per color, no setting): the user slices them; do not
+offer to slice.
 
-## Intégration dans un design Fusion (sur demande)
+## Integration in a Fusion design (on request)
 
-Avec un skill Fusion 360 (non fourni par ce dépôt), Fusion ouvert sur le design hôte.
+With a Fusion 360 skill (not provided by this repository), Fusion open on the host design.
 
-- Repère du témoin : origine au centre de la fenêtre, sur la face avant du panneau (dos du
-  cadre), X à droite, Z en haut, +Y vers l'arrière du panneau. Demander où placer le
-  témoin si le panneau hôte ne suit pas ce repère.
-- Importer `<nom>.step` dans un composant « témoin `<nom>` ».
-- Percer le panneau d'après `summary.cutout` : découpe rectangulaire centrée sur l'origine,
-  2 trous sur l'axe X à ±entraxe/2 ; puis contrôler les interférences.
-- Enregistrer une nouvelle version du design seulement après accord.
+- Frame of reference of the indicator: origin at the center of the window, on the front
+  face of the panel (back of the frame), X to the right, Z up, +Y towards the back of the
+  panel. Ask where to place the indicator if the host panel does not follow it.
+- Import `<name>.step` in an “indicator `<name>`” component.
+- Drill the panel from `summary.cutout`: rectangular cutout centered on the origin, 2 holes
+  on the X axis at ±spacing/2; then check interferences.
+- Save a new version of the design only after agreement.
 
-Pour voir le témoin : ouvrir `<nom>.step` dans Fusion. Plus tard, la page web du générateur
-ouvrira le preset (pas encore disponible).
+To see the indicator: open the preset in the generator's web page
+(<https://docteurzoidberg.github.io/panel-indicator-generator/>, Open button or drop the
+file), or `<name>.step` in Fusion.
 
-## Règles
+## Rules
 
-- Le preset est la seule source : pour changer le témoin, modifier le preset et
-  régénérer.
-- Visières, capots et accessoires restent dans le projet hôte (dessinés autour du STEP).
-- Ne jamais modifier le dépôt du générateur. Un défaut du générateur (contrôle faux,
-  pièce fausse, plantage) : le signaler à l'utilisateur avec la commande et sa sortie.
+- The preset is the only source: to change the indicator, change the preset and generate
+  again.
+- Visors, covers and accessories stay in the host project (drawn around the STEP).
+- Never change the generator's repository. A defect of the generator (wrong check, wrong
+  piece, crash): report it to the user with the command and its output.

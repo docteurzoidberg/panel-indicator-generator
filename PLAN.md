@@ -1,176 +1,177 @@
-# Plan — générateur de témoin lumineux
+# Plan — panel indicator generator
 
-Mise à jour : 18/11/2026. Plan du générateur (étapes 3 à 5 : ordre, pile,
-lots) : [docs/plan-generateur.md](docs/plan-generateur.md) ; spécification
-(preset, contrôles, page, sorties, ligne de commande) :
-[docs/generateur.md](docs/generateur.md) ; skill : [docs/skill.md](docs/skill.md).
+Updated: 2026-11-18. Generator plan (steps 3 to 5: order, stack,
+lots): [docs/generator-plan.md](docs/generator-plan.md); specification
+(preset, checks, page, outputs, command line):
+[docs/generator.md](docs/generator.md); skill: [docs/skill.md](docs/skill.md).
 
-## Feuille de route (plan de l'utilisateur, 29/10/2026 ; étapes 3 à 5 réordonnées le 30/10/2026)
+## Roadmap (the user's plan, 2026-10-29; steps 3 to 5 reordered on 2026-10-30)
 
-Les étapes se lancent une à une, à la demande de l'utilisateur.
+Steps are started one at a time, at the user's request.
 
-1. **Maquette dans Fusion** : faite et validée le 29/10/2026 ; dépôt à
-   part depuis le 31/10/2026, avec ses points à revoir ; ses sorties de
-   référence pour les tests sont dans `core/test/ref/`.
-2. **Impressions d'essai** *(faites et validées, noté le 16/11/2026)* : l'utilisateur imprime et fait ses
-   retours ; retour à l'étape 1 si besoin. La maquette doit rester simple à
-   régénérer depuis le design Fusion (STL, images, vue éclatée) : ces
-   opérations sont aujourd'hui plusieurs scripts, à réduire à une seule
-   commande. Essais utiles : jeux (feuillure, découpe, fond), légendes
-   (voile, polices, tailles), banc lumineux, ruban clipsé. Maquette
-   régénérée le 30/10/2026 : ruban WS2812B à 144 LED/m (voir Principes)
-   clipsé sur le fond sans adhésif, LED à 10 mm de la légende, cadre de 47.
-   1er essai (30/10/2026) : tout bon (M3 validée) sauf le fond, qui avait
-   du jeu latéral et sortait trop facilement ; fond seul corrigé (bouts de
-   rails arrondis en serrage, nervures plus grosses) et 2e essai sur une
-   série de 3 serrages : 0,3 mm retenu. Essai M2,5 reporté après la v1
-   (vis M3 seulement en v1).
-3. **Noyau et ligne de commande** *(fait le 30/10/2026, branche
-   `etape-3-noyau`)* : pièces, contrôles et exports (3MF, STL,
-   STEP, gabarit, nomenclature) construits depuis le preset, commande
-   `indicator` ; d'abord un prototype du moteur géométrique, puis la parité
-   avec la maquette Fusion.
-4. **Skill Claude Code global** *(fait le 30/10/2026, branche `etape-4-skill`)* (lien
-   depuis `~/.claude/skills`, source dans `skill/`) : demander un témoin depuis un projet hôte, le générer depuis
-   son preset, l'intégrer sur demande dans son design Fusion ; premier
-   client, le Claudemètre.
-5. **Page web** *(fait le 31/10/2026, branche `etape-5-web`)* : réglages ou preset ouvert (celui d'un projet hôte, par
-   exemple), aperçu en temps réel (éclaté ou assemblé, éteint
-   ou allumé) et téléchargements, dans le navigateur, sans serveur.
-6. **Anglais par défaut, nouveau dépôt** *(décidée le 18/11/2026 ; lots 6.1 à 6.4
-   faits le 18/11/2026)* : le projet passe dans un nouveau dépôt
-   `panel-indicator-generator`, en anglais américain, qui devient la
-   référence ; ce dépôt-ci, en français, est gardé un temps puis gelé. En
-   français restent une version des docs et la page, multilingue. Lots :
-   1. *Nouveau dépôt* : historique public repris, messages des 6 commits
-      qui ne sont pas en anglais américain réécrits (arbres, auteurs et
-      dates inchangés, vérifiés avant le push) ; page publiée sur GitHub
-      Pages à sa propre adresse.
-   2. *Noms* : terme anglais « indicator » ; paquets `@indicator/*`,
-      commande `indicator`, skill `panel-indicator`, préfixe du cache hors
-      ligne ; orthographe américaine partout (`color`, `license`,
-      `center`, `licenses.txt`), sauf les identifiants d'API externes
-      (`organiseBlueprints` de replicad).
-   3. *Noyau et commande* : messages dans la langue demandée (anglais par
-      défaut), catalogue en/fr dans `core/src/messages.ts` (contrôles,
-      résumé, erreurs du preset) ; nombres formatés selon la langue ; la
-      page reste en français jusqu'au lot 6.4 (libellés des pièces et aides
-      des champs passés côté page) ; JSON Schema en anglais ; noms des
-      fichiers produits en anglais, fixes quelle que soit la langue ;
-      sortie de la commande en anglais ; la référence de test (preset
-      ALARME de la maquette) séparée du preset d'exemple, qui passe en
-      anglais (`presets/alarm.json`, ALARM). Clés du preset inchangées : il
-      reste en v1. Zip de la page et fichiers de la commande : preset et
-      STEP identiques, STL et 3MF de même géométrie (OpenCascade peut
-      couper un quadrilatère plat par l'autre diagonale dans le navigateur ;
-      vu avec ALARM, décidé le 18/11/2026).
-   4. *Page multilingue* : langue du navigateur si c'est l'anglais ou le
-      français, sinon l'anglais ; choix EN / FR dans l'en-tête, retenu par
-      la page (navigateur) et appliqué sur place, sans rechargement ;
-      textes de la page dans `web/src/texts.ts` ; `licenses.txt` en
-      anglais ; format des liens de partage inchangé ; tests de la page en
-      anglais et en français.
-   5. *Docs* : anglais à leur place ; version française du README, de
-      `generateur.md` et de `skill.md` (`README.fr.md`, `docs/fr/`) ; les
-      journaux (`PLAN.md`, `plan-generateur.md`) en anglais seulement ;
-      presets des projets hôtes dans `design/indicator/` (au lieu de
-      `design/temoin/`, décidé le 18/11/2026) ; noms des fichiers produits et
-      preset d'exemple du lot 6.3 repris dans les docs et le skill ;
-      un hook signale les docs françaises en retard sur leur version
-      anglaise.
-   6. *Bascule* : ce dépôt-ci gelé, avec un bandeau sur sa page qui ouvre
-      le même preset dans la nouvelle ; les projets hôtes passent au
-      nouveau dépôt à leur rythme ; ce dépôt-ci archivé ensuite.
+1. **Mock-up in Fusion**: done and validated on 2026-10-29; separate
+   repository since 2026-10-31, with its points to review; its reference
+   outputs for the tests are in `core/test/ref/`.
+2. **Test prints** *(done and validated, noted on 2026-11-16)*: the user prints and gives
+   feedback; back to step 1 if needed. The mock-up must stay easy to
+   regenerate from the Fusion design (STL, images, exploded view): these
+   operations are currently several scripts, to be reduced to a single
+   command. Useful tests: clearances (rebate, cutout, cover), legends
+   (veil, fonts, sizes), light bench, clipped strip. Mock-up
+   regenerated on 2026-10-30: WS2812B strip at 144 LED/m (see Principles)
+   clipped on the cover without adhesive, LEDs 10 mm from the legend, 47 mm frame.
+   1st test (2026-10-30): all good (M3 validated) except the cover, which had
+   side play and came out too easily; cover alone fixed (rail ends
+   rounded for a press fit, bigger ribs) and 2nd test on a
+   series of 3 press fits: 0.3 mm chosen. M2.5 test postponed until after v1
+   (M3 screws only in v1).
+3. **Core and command line** *(done on 2026-10-30, branch
+   `etape-3-noyau`)*: parts, checks and exports (3MF, STL,
+   STEP, template, bill of materials) built from the preset, command
+   `indicator`; first a prototype of the geometry engine, then parity
+   with the Fusion mock-up.
+4. **Global Claude Code skill** *(done on 2026-10-30, branch `etape-4-skill`)* (link
+   from `~/.claude/skills`, source in `skill/`): request an indicator from a host project, generate it from
+   its preset, integrate it on request into its Fusion design; first
+   client, the Claudemètre.
+5. **Web page** *(done on 2026-10-31, branch `etape-5-web`)*: settings or opened preset (a host project's, for
+   example), real-time preview (exploded or assembled, off
+   or on) and downloads, in the browser, without a server.
+6. **English by default, new repository** *(decided on 2026-11-18; lots 6.1 to 6.5
+   done on 2026-11-18, 6.6 to do)*: the project moves to a new repository
+   `panel-indicator-generator`, in US English, which becomes the
+   reference; the French repository, `generateur-temoin-lumineux`, is kept
+   for a while, then frozen. What stays in French: a version of the docs
+   and the page, multilingual. Lots:
+   1. *New repository*: public history carried over, messages of the 6 commits
+      not in US English rewritten (trees, authors and
+      dates unchanged, checked before the push); page published on GitHub
+      Pages at its own address.
+   2. *Names*: English term "indicator"; packages `@indicator/*`,
+      command `indicator`, skill `panel-indicator`, offline cache
+      prefix; US spelling everywhere (`color`, `license`,
+      `center`, `licenses.txt`), except external API identifiers
+      (replicad's `organiseBlueprints`).
+   3. *Core and command*: messages in the requested language (English by
+      default), en/fr catalog in `core/src/messages.ts` (checks,
+      summary, preset errors); numbers formatted per language; the
+      page stays in French until lot 6.4 (part labels and field
+      help moved to the page side); JSON Schema in English; names of the
+      produced files in English, fixed whatever the language; command
+      output in English; the test reference (the mock-up's
+      ALARME preset) separated from the example preset, which switches to
+      English (`presets/alarm.json`, ALARM). Preset keys unchanged: it
+      stays at v1. Page zip and command files: identical preset and
+      STEP, STL and 3MF of the same geometry (OpenCascade may
+      split a flat quadrilateral along the other diagonal in the browser;
+      seen with ALARM, decided on 2026-11-18).
+   4. *Multilingual page*: the browser's language if it is English or
+      French, otherwise English; EN / FR choice in the header, remembered by
+      the page (browser) and applied in place, without reloading;
+      page texts in `web/src/texts.ts`; `licenses.txt` in
+      English; share link format unchanged; page tests in
+      English and in French.
+   5. *Docs*: English in place; French version of the README, of
+      `generator.md` and of `skill.md` (`README.fr.md`, `docs/fr/`); the
+      journals (`PLAN.md`, `generator-plan.md`) in English only;
+      host project presets in `design/indicator/` (instead of
+      `design/temoin/`, decided on 2026-11-18); produced file names and
+      example preset of lot 6.3 carried into the docs and the skill;
+      a hook flags French docs behind their English
+      version.
+   6. *Switch*: the French repository frozen, with a banner on its page that opens
+      the same preset in the new one; host projects move to the
+      new repository at their own pace; the French repository archived afterwards.
 
-Détail des étapes 3 à 5 : [docs/plan-generateur.md](docs/plan-generateur.md).
+Details of steps 3 to 5: [docs/generator-plan.md](docs/generator-plan.md).
 
-Ensuite, à replanifier : gabarit de découpe, nomenclature, recalage du modèle
-d'uniformité sur photos, variantes (cadre rond, 2 lignes, pictogrammes SVG,
-cloisons et zones, clips, vis par l'arrière, légende sur film imprimé, façade
-« dead front », autres LED).
+Next, to be replanned: cutout template, bill of materials, recalibration of the
+uniformity model on photos, variants (round frame, 2 lines, SVG pictograms,
+partitions and zones, clips, screws from the back, legend on printed film,
+"dead front" face, other LEDs).
 
-## Décisions à prendre
+## Decisions to make
 
-- [x] Moteur géométrique (30/10/2026) : replicad, d'après le prototype du
-      lot 3.0 (temps, poids, parité, STEP relu par Fusion : voir
-      [docs/plan-generateur.md](docs/plan-generateur.md)).
-- [x] Langue de l'interface (30/10/2026) : français pour la v1 ; plus tard,
-      page multilingue avec des libellés i18n. Code en anglais (30/10/2026) :
-      commentaires, identifiants, fichiers et tests de `core/`, `cli/`, `web/`.
-      Anglais par défaut (18/11/2026) : nouveau dépôt
-      `panel-indicator-generator` en anglais américain (code, commandes,
-      docs, historique), page en anglais et en français, version française
-      des docs ; ce dépôt-ci gardé un temps (étape 6).
-- [x] Publication : dépôt public parti d'un seul commit (31/10/2026 ;
-      l'historique de travail reste privé) ; page sur GitHub Pages,
-      construite et publiée par `.github/workflows/page.yml` à chaque push
-      sur `main` ; licence WTFPL v2 pour le code du dépôt (31/10/2026),
-      les dépendances et les polices gardant la leur.
-- [x] Ordre (30/10/2026) : ligne de commande et skill avant la page web.
-- [x] Pile (30/10/2026) : TypeScript, bibliothèques 100 % libres, un seul
-      noyau pour la ligne de commande, le skill et la page.
-- [x] 3MF génériques (30/10/2026) : rien de propre à un slicer ; une pièce
-      par couleur dans le même 3MF. Le tranchage reste à l'utilisateur ;
-      Snapmaker Orca hors périmètre (un projet hôte qui veut trancher a son
-      propre skill).
-- [x] Preset d'exemple en M3 : cadre élargi de 44 à 47 (30/10/2026), vis
-      centrées entre la fenêtre et le bord.
-- [x] Preset v1 réduit à ce qui a été validé à l'impression (30/10/2026) :
-      texte (une ligne), fenêtre, cadre, panneau, tête de vis fraisée ou
-      cylindrique, sortie des fils à gauche ou à droite, couleurs du cadre et
-      du fond de la légende (noir par défaut). Vis M3 et inserts à chaud
-      seulement, entraxe calculé ; pas d'écrous ni de collage ; pas de types
-      de filament (choisis au tranchage). M2, M2,5 et le reste viendront
-      chacun après une impression d'essai.
-- [x] Fond de la boîte (4e pièce, porte le ruban clipsé) : tenu en
-      serrage de 0,3 mm (nervures et bouts des rails), choisi à l'essai le
-      30/10/2026 ; pas de vis traversantes.
+- [x] Geometry engine (2026-10-30): replicad, based on the lot 3.0
+      prototype (times, size, parity, STEP read back by Fusion: see
+      [docs/generator-plan.md](docs/generator-plan.md)).
+- [x] Interface language (2026-10-30): French for v1; later,
+      multilingual page with i18n labels. Code in English (2026-10-30):
+      comments, identifiers, files and tests of `core/`, `cli/`, `web/`.
+      English by default (2026-11-18): new repository
+      `panel-indicator-generator` in US English (code, commands,
+      docs, history), page in English and in French, French version
+      of the docs; the French repository kept for a while (step 6).
+- [x] Publication: public repository started from a single commit (2026-10-31;
+      the working history stays private); page on GitHub Pages,
+      built and published by `.github/workflows/page.yml` on each push
+      to `main`; WTFPL v2 license for the repository's code (2026-10-31),
+      dependencies and fonts keeping their own.
+- [x] Order (2026-10-30): command line and skill before the web page.
+- [x] Stack (2026-10-30): TypeScript, 100 % free libraries, a single
+      core for the command line, the skill and the page.
+- [x] Generic 3MF (2026-10-30): nothing specific to a slicer; one part
+      per color in the same 3MF. Slicing is left to the user;
+      Snapmaker Orca out of scope (a host project that wants to slice has its
+      own skill).
+- [x] Example preset in M3: frame widened from 44 to 47 mm (2026-10-30), screws
+      centered between the window and the edge.
+- [x] v1 preset reduced to what was validated in print (2026-10-30):
+      text (one line), window, frame, panel, countersunk or socket
+      screw head, wire exit on the left or on the right, colors of the frame and
+      of the legend background (black by default). M3 screws and heat-set inserts
+      only, spacing computed; no nuts or gluing; no filament
+      types (chosen at slicing). M2, M2.5 and the rest will each come
+      after a test print.
+- [x] Box cover (4th part, carries the clipped strip): held by a
+      0.3 mm press fit (ribs and rail ends), chosen by test on
+      2026-10-30; no through screws.
 
-## Principes
+## Principles
 
-- **Générique** : rien de propre à un projet hôte ; ses presets vivent dans
-  son dépôt (ex. le Claudemètre : `design/temoin/claude.json`).
-- **Le preset est le contrat**, versionné ; **un seul noyau** (géométrie,
-  contrôles, exports) pour la ligne de commande, le skill et la page.
-- **100 % libre** : bibliothèques open source seulement (licences :
-  [docs/plan-generateur.md](docs/plan-generateur.md)).
-- **Page statique**, sans serveur, utilisable hors ligne.
-- **Fabrication** : FDM, multi-filament jusqu'à 4 têtes, mono-filament
-  possible ; quincaillerie courante (M2 à M3, inserts à chaud, écrous) ; en
-  v1, vis M3 et inserts à chaud seulement.
-- **Ruban de référence** : WS2812B 5 V à 144 LED/m (pas 6,94 ; circuit
-  12 × 0,5 ; LED 5050), coupable après chaque LED : le tronçon s'ajuste à la
-  fenêtre, au plus près de la règle nombre = largeur de fenêtre / pas,
-  arrondi (4 LED pour 27 mm).
-- **3MF faits ici**, tranchage à l'utilisateur.
+- **Generic**: nothing specific to a host project; its presets live in
+  its repository (e.g. the Claudemètre: `design/indicator/claude.json`).
+- **The preset is the contract**, versioned; **a single core** (geometry,
+  checks, exports) for the command line, the skill and the page.
+- **100 % free**: open source libraries only (licenses:
+  [docs/generator-plan.md](docs/generator-plan.md)).
+- **Static page**, without a server, usable offline.
+- **Manufacturing**: FDM, multi-filament up to 4 toolheads, single filament
+  possible; common hardware (M2 to M3, heat-set inserts, nuts); in
+  v1, M3 screws and heat-set inserts only.
+- **Reference strip**: WS2812B 5 V at 144 LED/m (pitch 6.94; board
+  12 × 0.5; 5050 LEDs), cuttable after each LED: the segment fits the
+  window, as close as possible to the rule count = window width / pitch,
+  rounded (4 LEDs for 27 mm).
+- **3MF made here**, slicing left to the user.
 
-## Anatomie et vocabulaire
+## Anatomy and vocabulary
 
-| Terme | Définition |
+| Term | Definition |
 | --- | --- |
-| cadre | collerette en façade, devant le panneau |
-| lèvre | bord du cadre autour de la fenêtre, sur lequel la légende s'appuie |
-| feuillure | logement de la légende au dos du cadre |
-| fenêtre | partie visible de la légende |
-| légende | plaquette multi-filament : **masque** opaque, **lettres** translucides, **voile** diffuseur continu derrière (il porte les îlots des A, D, O, R) ; lettres et voile d'un même filament ne font qu'un corps |
-| boîte à lumière | **tube** (intérieur = fenêtre) qui traverse la découpe et plaque la légende contre la lèvre ; **bride** derrière le panneau, avec les inserts ; **logement** du ruban ; **cloisons** en option |
-| fond | ferme le logement au dos de la boîte ; porte le ruban, clipsé entre deux **rails** qui entrent dans la boîte ; sa **languette** ferme la fente de la nappe, taillée dans la paroi de la boîte |
-| découpe | trou du panneau : tube + jeu, plus 2 trous de vis |
+| frame | front bezel, in front of the panel |
+| lip | edge of the frame around the window, against which the legend rests |
+| rebate | recess for the legend at the back of the frame |
+| window | visible part of the legend |
+| legend | multi-filament plate: opaque **mask**, translucent **letters**, continuous diffusing **veil** behind (it carries the islands of the A, D, O, R); letters and veil of the same filament form a single body |
+| light box | **tube** (inside = window) that goes through the cutout and presses the legend against the lip; **flange** behind the panel, with the inserts; **pocket** for the strip; optional **partitions** |
+| cover | closes the pocket at the back of the box; carries the strip, clipped between two **rails** that go into the box; its **tab** closes the ribbon cable slot, cut in the box wall |
+| cutout | hole in the panel: tube + clearance, plus 2 screw holes |
 
-Masque, lettres et voile s'impriment ensemble, dans la même famille de matière
-(PETG avec PETG, PLA avec PLA). Cadre, boîte et fond sont des pièces séparées ;
-boîte et fond opaques, en noir de préférence.
+Mask, letters and veil are printed together, in the same material family
+(PETG with PETG, PLA with PLA). Frame, box and cover are separate parts;
+box and cover opaque, preferably black.
 
-## Hors périmètre
+## Out of scope
 
-- Visières, casquettes, capots, supports et accessoires propres à un objet :
-  ils restent dans le projet hôte.
-- Électronique et firmware ; découpe du panneau hôte (l'outil donne le gabarit).
-- Tranchage et réglages de slicer, dont Snapmaker Orca.
-- Modèle paramétrique Fusion dans le générateur (Fusion reçoit des STEP),
-  rendu photoréaliste.
+- Visors, peaks, housings, supports and accessories specific to an object:
+  they stay in the host project.
+- Electronics and firmware; cutting the host panel (the tool gives the template).
+- Slicing and slicer settings, including Snapmaker Orca.
+- Fusion parametric model in the generator (Fusion receives STEP files),
+  photorealistic rendering.
 
-## Idées pour plus tard
+## Ideas for later
 
-- Extrait de configuration ESPHome ou WLED indicatif (LED, effets des états).
-- Rangée de témoins alignés sur un même panneau, avec un gabarit commun.
+- Indicative ESPHome or WLED configuration snippet (LEDs, state effects).
+- Row of indicators aligned on the same panel, with a common template.

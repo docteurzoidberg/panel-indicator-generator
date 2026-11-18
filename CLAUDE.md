@@ -1,36 +1,43 @@
-# Générateur de témoin lumineux
+# Panel indicator generator
 
-Témoins lumineux encastrables imprimés en 3D (légende éclairée dans un cadre
-monté dans une découpe de panneau) : un preset JSON décrit le témoin, le
-générateur en tire les fichiers d'impression (ligne de commande `indicator`,
-skill Claude Code, page web).
+3D-printed flush-mount backlit indicators (lit legend in a frame mounted in
+a panel cutout): a JSON preset describes the indicator, the generator
+derives the print files from it (`indicator` command line, Claude Code
+skill, web page).
 
-- **v1 = prototype fonctionnel** : seulement ce qui a été validé à
-  l'impression (réglages : `docs/generateur.md`, « Preset ») ; pas de
-  fonction non éprouvée.
-- Arborescence : `presets/`, `fonts/` (OFL), `docs/` (`plan-generateur.md`
-  à lire en premier, puis `generateur.md` et `skill.md`) ; `core/`
-  (TypeScript, `npm test`, `npm run typecheck`), `cli/` (`indicator generate
-  <preset>`, installé par `npm link`), `skill/` (lié depuis
-  `~/.claude/skills/panel-indicator`), `web/` (page Vite, `npm run web`).
-  Feuille de route, décisions, vocabulaire : `PLAN.md`. Les cotes viennent
-  d'une maquette Fusion, dans un dépôt à part ; ses sorties de référence
-  pour les tests sont dans `core/test/ref/`.
-- Échanges en français ; docs en cours de passage à l'anglais (lot 6.5).
-  Code de `core/`, `cli/` et `web/` entièrement en anglais américain :
-  commentaires, identifiants, noms de fichiers et de tests, erreurs
-  internes. Textes montrés à l'utilisateur : anglais par défaut ; la page
-  et les messages du noyau existent aussi en français (`web/src/texts.ts`,
-  `core/src/messages.ts`) ; sortie de `indicator`, noms des fichiers
-  produits et descriptions du schéma en anglais seulement.
-- Générique : rien de propre à un projet hôte, dont les presets restent dans
-  son dépôt. Visières et accessoires d'un objet : hors périmètre.
-- Visserie : v1 = vis M3 et inserts à chaud (tête fraisée ou cylindrique),
-  entraxe et longueur calculés ; M2 et M2,5 plus tard, au choix de
-  l'utilisateur. Pas de types de filament : choisis au tranchage.
-- 3MF génériques (une pièce par couleur), faits ici ; le tranchage reste à
-  l'utilisateur, dans le logiciel de son choix.
-- Tests en local : le hook `.githooks/pre-push` (activé par `npm install`)
-  lance typecheck et `npm test` avant chaque push, sur un arbre commité ;
-  l'action GitHub (`.github/workflows/page.yml`) ne fait que typecheck,
-  build et publication de la page sur GitHub Pages.
+- **v1 = working prototype**: only what has been validated in print
+  (settings: `docs/generator.md`, “Preset”); no unproven feature.
+- Layout: `presets/`, `fonts/` (OFL), `docs/` (`generator-plan.md` to read
+  first, then `generator.md` and `skill.md`; French version of the last two
+  in `docs/fr/`, of the README in `README.fr.md`); `core/` (TypeScript,
+  `npm test`, `npm run typecheck`), `cli/` (`indicator generate <preset>`,
+  installed by `npm link`), `skill/` (linked from
+  `~/.claude/skills/panel-indicator`), `web/` (Vite page, `npm run web`).
+  Roadmap, decisions, vocabulary: `PLAN.md`. The dimensions come from a
+  Fusion mock-up, in a separate repository; its reference outputs for the
+  tests are in `core/test/ref/`.
+- Exchanges with the user in French. Everything in the repository in US
+  English: code of `core/`, `cli/` and `web/` (comments, identifiers, file
+  and test names, internal errors), hooks, docs, commit messages. Texts
+  shown to the user: English by default; the page and the core's messages
+  also exist in French (`web/src/texts.ts`, `core/src/messages.ts`);
+  `indicator` output, names of the produced files and schema descriptions
+  in English only.
+- French docs: `README.fr.md`, `docs/fr/generator.md`, `docs/fr/skill.md`
+  follow their English version; the pre-push hook refuses a push where an
+  English doc changed without its French version
+  (`.githooks/docs-fr-behind`). The journals (`PLAN.md`,
+  `docs/generator-plan.md`) are in English only.
+- Generic: nothing specific to a host project, whose presets stay in its
+  repository (`design/indicator/<name>.json` by convention). Visors and
+  accessories of an object: out of scope.
+- Fasteners: v1 = M3 screws and heat-set inserts (countersunk or socket
+  head), spacing and length computed; M2 and M2.5 later, chosen by the
+  user. No filament types: chosen when slicing.
+- Generic 3MF (one part per color), made here; slicing stays with the
+  user, in the software of their choice.
+- Local tests: the `.githooks/pre-push` hook (enabled by `npm install`)
+  runs the French docs check, the typecheck and `npm test` before each
+  push, on a committed tree; the GitHub action
+  (`.github/workflows/page.yml`) only typechecks, builds and publishes the
+  page on GitHub Pages.

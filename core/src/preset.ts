@@ -1,5 +1,5 @@
 // Preset v1: the contract between the command line, the skill and the page (settings:
-// docs/generateur.md). Dimensions in mm. v1 only sets what has been validated in print
+// docs/generator.md). Dimensions in mm. v1 only sets what has been validated in print
 // (decision of 30/10/2026); everything else is fixed in the core. Only the text and the
 // panel thickness are required; every other key defaults to the value of the example
 // presets/alarm.json, with black colors. An unknown key is rejected (typo). Compatible

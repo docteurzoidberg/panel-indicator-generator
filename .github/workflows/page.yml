@@ -1,7 +1,7 @@
 # Web page: typechecked, built and published on GitHub Pages on every push to main (Pages
 # source: "GitHub Actions" in the repository settings). The tests run locally before every
 # push (.githooks/pre-push), the page tests in headless Chromium included.
-name: Page web
+name: Web page
 
 on:
   push:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build:
-    name: Contrôler et construire
+    name: Check and build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -35,7 +35,7 @@ jobs:
           path: web/dist
 
   deploy:
-    name: Publier
+    name: Publish
     needs: build
     runs-on: ubuntu-latest
     environment:

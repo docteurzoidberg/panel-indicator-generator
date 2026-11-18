@@ -1,4 +1,4 @@
-// v1 checks (docs/generateur.md, checks section): ok, warning or error; an error prevents
+// v1 checks (docs/generator.md, checks section): ok, warning or error; an error prevents
 // generation. Thresholds come from the specification; walls and strokes of at least 2
 // nozzle widths. Lighting uniformity awaits a model fitted on photos (later). Messages are
 // in the requested language (messages.ts).

@@ -1,0 +1,18 @@
+#!/bin/sh
+# English docs ahead of their French version, from the commits not pushed yet: an English
+# doc changed after the last commit of its French version. One line per doc:
+# "doc_en doc_fr last_commit_of_doc_fr". Nothing when every French doc follows.
+# Usage: .githooks/docs-fr-behind [commit]   (HEAD by default)
+# A doc added to the French version is added to the list below too.
+ref=${1:-HEAD}
+
+while read -r en fr; do
+  base=$(git log -1 --format=%H "$ref" -- "$fr")
+  range=${base:+$base..}$ref
+  n=$(git rev-list --count "$range" --not --remotes -- "$en")
+  [ "$n" -eq 0 ] || printf '%s %s %s\n' "$en" "$fr" "${base:--}"
+done <<LIST
+README.md README.fr.md
+docs/generator.md docs/fr/generator.md
+docs/skill.md docs/fr/skill.md
+LIST

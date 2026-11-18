@@ -8,7 +8,7 @@
 // ESM file of the package, read as is by Node and Vite (the main entry is CommonJS).
 import { parse, type Font, type Glyph, type PathCommand } from 'opentype.js/dist/opentype.mjs';
 
-// Values fixed in v1 (docs/generateur.md, "Preset").
+// Values fixed in v1 (docs/generator.md, "Preset").
 export const LEGEND = {
   font: 'Barlow Condensed SemiBold',
   fontFile: 'BarlowCondensed-SemiBold.ttf',

@@ -1,76 +1,79 @@
-# Générateur de témoin lumineux
+[Version française](README.fr.md)
 
-Génère des **témoins lumineux encastrables**, imprimables en 3D, pour
-n'importe quel projet : une légende qui s'allume derrière une fenêtre, dans
-un cadre qui se monte dans la découpe d'un panneau, comme un voyant ou un
-annonciateur de tableau de bord.
+# Panel indicator generator
 
-**Page en ligne : <https://docteurzoidberg.github.io/panel-indicator-generator/>**
-(tout se calcule dans le navigateur, sans serveur ; marche hors ligne une
-fois chargée).
+Generates **flush-mount backlit indicators**, 3D-printable, for any
+project: a legend that lights up behind a window, in a frame mounted in a
+panel cutout, like a warning light or a dashboard annunciator.
 
-> **État (31/10/2026) : v1 utilisable.** La page, la commande `indicator` et
-> le skill Claude Code produisent les mêmes fichiers depuis un preset. Les
-> pièces sont celles d'impressions d'essai validées, en vis M3 ; la v1 ne
-> règle que ce qui a été éprouvé. Feuille de route : [PLAN.md](PLAN.md).
+**Online page: <https://docteurzoidberg.github.io/panel-indicator-generator/>**
+(everything is computed in the browser, without a server; works offline
+once loaded; in English or French).
 
-## Le témoin
+> **Status (2026-11-18): v1 usable.** The page, the `indicator` command and
+> the Claude Code skill produce the same files from a preset. The pieces
+> are those of validated test prints, with M3 screws; v1 only sets what has
+> been proven. Roadmap: [PLAN.md](PLAN.md).
+
+## The indicator
 
 ```text
-Coupe, vue de dessus : avant à gauche, mur à droite
+Section, seen from above: front on the left, wall on the right
 
-         cadre  panneau      boîte à lumière + bride
+         frame  panel        light box + flange
         ┌──────┬────────┬───────────────────────────┐
-  vis ══╪══════╪════════╪══▓▓ insert                │
+screw ══╪══════╪════════╪══▓▓ insert                │
         │      ├────────┤                           │
         │   ┌──┴────────┴──────────────────────┐    │
         │   █                                ● │    │
-        │   █ légende        lumière         ● │    │  LED
+        │   █ legend         light           ● │    │  LEDs
         │   █                                ● │    │
         │   └──┬────────┬──────────────────────┘    │
         │      ├────────┤                           │
-  vis ══╪══════╪════════╪══▓▓ insert                │
+screw ══╪══════╪════════╪══▓▓ insert                │
         └──────┴────────┴───────────────────────────┘
           ▲        ▲
-          │        └ découpe du panneau, traversée par le tube
-          └ lèvre du cadre : la légende s'y appuie
+          │        └ panel cutout, crossed by the tube
+          └ lip of the frame: the legend rests on it
 ```
 
-| Pièce | Rôle |
+| Piece | Role |
 | --- | --- |
-| **Cadre** | collerette visible en façade ; sa lèvre borde la fenêtre et retient la légende |
-| **Légende** | plaquette mince multi-filament : masque opaque, lettres translucides, voile diffuseur derrière. Seule pièce à réimprimer pour changer de texte |
-| **Boîte à lumière** | tube qui traverse le panneau et plaque la légende contre la lèvre, bride qui serre le panneau par l'arrière, logement du ruban de LED |
-| **Fond** | ferme le logement au dos de la boîte et porte le ruban, clipsé ; emboîté en serrage, il se retire au tournevis ; fente pour la nappe des fils |
+| **Frame** | collar seen from the front; its lip borders the window and holds the legend |
+| **Legend** | thin multi-filament plate: opaque mask, translucent letters, diffusing veil behind. The only piece to reprint to change the text |
+| **Light box** | tube that crosses the panel and presses the legend against the lip, flange that clamps the panel from behind, housing of the LED strip |
+| **Cover** | closes the housing at the back of the box and carries the strip, clipped in; press-fitted, it comes off with a screwdriver; slot for the wire ribbon |
 
-Il faut aussi 2 vis M3 et 2 inserts à chaud, et un tronçon de ruban
-WS2812B à 144 LED/m. Le panneau ne demande qu'une découpe et 2 trous. Le
-tube a la longueur de l'épaisseur du panneau : c'est le seul réglage qui
-dépend du panneau, qu'il soit imprimé, en tôle ou en bois. Un panneau
-d'essai, imprimable, permet de monter le témoin avant de percer le vrai.
+You also need 2 M3 screws, 2 heat-set inserts and a piece of WS2812B strip
+at 144 LEDs/m. The panel only needs a cutout and 2 holes. The tube is as
+long as the panel is thick: the only setting that depends on the panel,
+whether printed, sheet metal or wood. A printable test panel lets you
+mount the indicator before drilling the real one.
 
-## La page
+## The page
 
-- **Réglages** du preset, contrôlés à chaque saisie : ce qui ne
-  s'imprimera pas ou ne tiendra pas est signalé, avec le montage (découpe,
-  vis, LED).
-- **Aperçu** 3D (pièces éclatées ou assemblées, masquables) ou vue de
-  face, avec la lumière simulée : éteinte, fixe, respiration ou
-  clignotement, dans la couleur de son choix.
-- **Presets** : ouvrir un fichier (ou le glisser sur la page), l'enregistrer,
-  partir d'un exemple ; le lien de la page porte le preset.
-- **Télécharger** le zip des fichiers d'impression, les mêmes que ceux de
+- **Settings** of the preset, checked on every input: what will not print
+  or will not hold is flagged, along with the mounting (cutout, screws,
+  LEDs).
+- **Preview** in 3D (pieces exploded or assembled, can be hidden) or from
+  the front, with simulated light: off, steady, breathing or blinking, in
+  the color of your choice.
+- **Presets**: open a file (or drop it on the page), save it, start from an
+  example; the page link carries the preset.
+- **Download** the zip of the print files, the files of
   `indicator generate`.
+- **Language**: the browser's (English or French, else English), or the
+  one chosen in the header, kept by the page.
 
-## Le preset
+## The preset
 
-Un témoin est décrit par un fichier JSON, par exemple
-[`presets/alarme.json`](presets/alarme.json) :
+An indicator is described by a JSON file, for example
+[`presets/alarm.json`](presets/alarm.json):
 
 ```json
 {
   "version": 1,
-  "legend": { "text": "ALARME", "background": "#111111" },
+  "legend": { "text": "ALARM", "background": "#111111" },
   "window": { "width": 27, "height": 10.5 },
   "frame": { "width": 47, "height": 18, "color": "#4b5320" },
   "panel": { "thickness": 3 },
@@ -79,141 +82,146 @@ Un témoin est décrit par un fichier JSON, par exemple
 }
 ```
 
-Seuls `legend.text` et `panel.thickness` sont obligatoires ; cotes en mm.
-Toutes les clés, leurs valeurs par défaut et les contrôles :
-[docs/generateur.md](docs/generateur.md). JSON Schema :
+Only `legend.text` and `panel.thickness` are required; dimensions in mm.
+All the keys, their default values and the checks:
+[docs/generator.md](docs/generator.md). JSON Schema:
 [`presets/schema.json`](presets/schema.json).
 
-## Ce que produit le générateur
+## What the generator produces
 
-| Fichier | Contenu |
+| File | Content |
 | --- | --- |
-| `<nom>_<impression>.3mf` | un par impression (légende, cadre, boîte et fond, panneau d'essai) ; pièces orientées, une par couleur, à trancher dans le logiciel de son choix |
-| `<nom>_<pièce>.stl` | une par pièce, orientée comme dans les 3MF |
-| `<nom>.step` | assemblage nommé et coloré, pour intégrer le témoin dans un projet (Fusion, FreeCAD) |
-| `<nom>.json` | le preset utilisé, valeurs par défaut comprises |
+| `<name>_<print>.3mf` | one per print (`legend`, `frame`, `box_cover`, `test_panel`); pieces oriented, one per color, to slice in the software of your choice |
+| `<name>_<piece>.stl` | one per piece, oriented as in the 3MF |
+| `<name>.step` | named and colored assembly, to integrate the indicator in a project (Fusion, FreeCAD) |
+| `<name>.json` | the preset used, default values included |
 
-La quincaillerie (longueur des vis, inserts, LED) et les cotes de la
-découpe sont dans le résumé de la page et de la commande. Fichiers
-identiques d'une génération à l'autre.
+The hardware (screw length, inserts, LEDs) and the dimensions of the
+cutout are in the summary of the page and of the command. Files identical
+from one generation to the next.
 
-## En local
+## Locally
 
-Node 22.18 ou plus.
+Node 22.18 or later.
 
 ```bash
 git clone https://github.com/docteurzoidberg/panel-indicator-generator.git
 cd panel-indicator-generator
 npm install
-npm run web          # la page, servie par Vite (http://localhost:5173)
+npm run web          # the page, served by Vite (http://localhost:5173)
 ```
 
 ```bash
 npm run typecheck
-npx playwright-core install --only-shell chromium   # Chromium headless des tests de la page
+npx playwright-core install --only-shell chromium   # headless Chromium of the page tests
 npm test
-npm run build -w @indicator/web                        # page construite dans web/dist
+npm run build -w @indicator/web                     # page built in web/dist
 ```
 
-`npm install` active aussi un hook git (`.githooks/pre-push`) : avant chaque
-push, il lance le typecheck et tous les tests, et bloque le push s'ils
-échouent. L'action GitHub, elle, ne fait que construire et publier la page.
+`npm install` also enables a git hook (`.githooks/pre-push`): before each
+push, it checks that the French docs follow their English version, runs
+the typecheck and all the tests, and blocks the push if they fail. The
+GitHub action only builds and publishes the page.
 
-### Ligne de commande
+### Command line
 
 ```bash
-(cd cli && npm link)                       # installe la commande indicator
-indicator check presets/alarme.json           # contrôles seuls, rien n'est écrit
-indicator generate presets/alarme.json        # fichiers dans presets/export/
+(cd cli && npm link)                         # installs the indicator command
+indicator check presets/alarm.json           # checks only, nothing is written
+indicator generate presets/alarm.json        # files in presets/export/
 ```
 
 ```text
-Témoin « alarme » (presets/alarme.json)
-✓ légende « ALARME » : capitales de 5,36 mm, à 1,50 mm du bord de la fenêtre
-⚠ espaces du masque plus fins que la buse : 0,05 mm² en x = -10,4, …
-✓ vis M3 × 10 (tête fraisée, ISO 10642)
-✓ 4 LED dans la fenêtre
+Indicator “alarm” (presets/alarm.json)
+✓ legend “ALARM”: 6.47 mm capitals, 1.50 mm from the window edge
+⚠ mask gaps thinner than the nozzle: 0.05 mm² at x = -0.4, …
+✓ M3 × 10 screws (countersunk head, ISO 10642)
+✓ 4 LEDs in the window
   …
-  panneau : découpe 29,8 × 13,3, 2 trous Ø 3,4 à 37 d'entraxe, centrés sur la fenêtre
+  panel: cutout 29.8 × 13.3, 2 holes Ø 3.4, 37 mm apart, centered on the window
 ```
 
-`--json` donne le même résultat pour un script ; code de sortie 0 si le
-preset est bon (avertissements possibles), 1 s'il est refusé.
+`--json` gives the same result for a script; exit code 0 if the preset is
+good (warnings possible), 1 if it is rejected.
 
-### Skill Claude Code
+### Claude Code skill
 
-Le skill `panel-indicator` fait la même chose depuis n'importe quel projet,
-qui garde son preset dans `design/temoin/<nom>.json` : « génère le témoin »,
-« vérifie le témoin », « fais un témoin ARMÉ, panneau de 3 mm ».
+The `panel-indicator` skill does the same from any project, which keeps its
+preset in `design/indicator/<name>.json`: “generate the indicator”, “check
+the indicator”, “make an ARMED indicator, 3 mm panel”.
 
 ```bash
-ln -s "$PWD/skill" ~/.claude/skills/panel-indicator   # depuis le dépôt cloné, après npm link
+ln -s "$PWD/skill" ~/.claude/skills/panel-indicator   # from the cloned repository, after npm link
 ```
 
-Mode d'emploi : [docs/skill.md](docs/skill.md).
+How to use it: [docs/skill.md](docs/skill.md).
 
-## Plus tard
+## Later
 
-Chaque réglage viendra après une impression d'essai : légende sur 2 lignes,
-autres polices, mode négatif (fond lumineux), vis M2 et M2,5, écrous
-prisonniers, autres rubans et LED, cloisons et zones, réglages de
-l'imprimante (buse, couche). Et aussi : gabarit de découpe à imprimer,
-nomenclature en fichier, coupe 3D dans la page, estimation de l'uniformité
-de l'éclairage. Détail : [PLAN.md](PLAN.md) et
-[docs/generateur.md](docs/generateur.md).
+Each setting will come after a test print: legend on 2 lines, other fonts,
+negative mode (lit background), M2 and M2.5 screws, captive nuts, other
+strips and LEDs, partitions and zones, printer settings (nozzle, layer).
+And also: printable cutout template, bill of materials as a file, 3D
+section in the page, estimate of the lighting uniformity. Details:
+[PLAN.md](PLAN.md) and [docs/generator.md](docs/generator.md).
 
-## Hors périmètre
+## Out of scope
 
-- **Visières, casquettes, capots, supports** : ils dépendent de chaque objet
-  et restent dans le projet hôte, dessinés autour du STEP du témoin.
-- **Électronique et firmware** : le générateur indique les LED et le passage
-  des fils, il ne pilote rien.
-- **Modèle paramétrique dans un logiciel de CAO** : il reçoit des STEP
-  générés ; les réglages vivent dans le preset.
-- **Tranchage** : les 3MF sont génériques, chacun tranche avec son logiciel.
+- **Visors, hoods, covers, brackets**: they depend on each object and stay
+  in the host project, drawn around the indicator's STEP.
+- **Electronics and firmware**: the generator gives the LEDs and the path
+  of the wires, it drives nothing.
+- **Parametric model in a CAD software**: it receives generated STEP files;
+  the settings live in the preset.
+- **Slicing**: the 3MF files are generic, everyone slices with their own
+  software.
 
-## Organisation du dépôt
+## Repository layout
 
 ```text
-PLAN.md     feuille de route, décisions, vocabulaire
-docs/       plan et spécification du générateur, mode d'emploi du skill
-core/       noyau (TypeScript) : preset, légende, pièces, contrôles, exports
-cli/        ligne de commande indicator (check, generate)
-skill/      skill Claude Code panel-indicator
-web/        page web (Vite) : le noyau dans des Web Workers, sans serveur
-presets/    presets d'exemple et JSON Schema du preset
-fonts/      polices libres fournies (OFL)
-.github/    action qui contrôle, construit et publie la page (GitHub Pages)
+PLAN.md     roadmap, decisions, vocabulary
+docs/       generator plan and specification, skill guide (French version in docs/fr/)
+core/       core (TypeScript): preset, legend, pieces, checks, exports, messages in English and French
+cli/        indicator command line (check, generate)
+skill/      panel-indicator Claude Code skill
+web/        web page (Vite): the core in Web Workers, without a server
+presets/    example presets and JSON Schema of the preset
+fonts/      free fonts provided (OFL)
+.github/    action that builds and publishes the page (GitHub Pages)
 ```
 
-## Licences
+## Licenses
 
-Ce dépôt (code, docs, presets, fichiers de référence des tests), © 2026
-DrZoid : **WTFPL**, version 2 ([LICENSE](LICENSE)). Il vient sans aucune
-garantie, dans la mesure permise par la loi applicable ; chacun peut le
-redistribuer et le modifier selon les termes de la Do What The Fuck You
+This repository (code, docs, presets, reference files of the tests), © 2026
+DrZoid: **WTFPL**, version 2 ([LICENSE](LICENSE)). It comes without any
+warranty, to the extent permitted by applicable law; anyone may
+redistribute and modify it under the terms of the Do What The Fuck You
 Want To Public License, version 2 (<https://www.wtfpl.net/>).
 
-Elle ne s'applique pas à ce qui vient d'ailleurs : ses dépendances, libres,
-et ses polices gardent leur licence, que la page cite dans son pied de
-page et dans `licenses.txt`, avec le texte de chacune. Elles autorisent
-cette licence pour notre code : OpenCascade (LGPL) reste un fichier à part,
-remplaçable, avec ses sources citées ; les polices restent sous OFL, avec
-leur texte (`fonts/OFL-Barlow.txt`).
+It does not apply to what comes from elsewhere: its dependencies, all
+free, and its fonts keep their license, which the page cites in its footer
+and in `licenses.txt`, with the text of each. They allow this license for
+our code: OpenCascade (LGPL) stays a separate, replaceable file, with its
+sources cited; the fonts stay under the OFL, with their text
+(`fonts/OFL-Barlow.txt`).
 
-- **OpenCascade** (Open CASCADE Technology, par `replicad-opencascadejs`) :
-  LGPL 2.1. Compilé en WebAssembly, il reste un fichier `.wasm` à part.
-  Sources : [OCCT](https://github.com/Open-Cascade-SAS/OCCT) et
+- **OpenCascade** (Open CASCADE Technology, through
+  `replicad-opencascadejs`): LGPL 2.1. Compiled to WebAssembly, it stays a
+  separate `.wasm` file. Sources:
+  [OCCT](https://github.com/Open-Cascade-SAS/OCCT) and
   [replicad-opencascadejs](https://github.com/sgenoud/replicad/tree/main/packages/replicad-opencascadejs).
-- Polices **Barlow Condensed** (`fonts/`) et **B612** : SIL Open Font
+- **Barlow Condensed** (`fonts/`) and **B612** fonts: SIL Open Font
   License 1.1.
-- three.js, replicad, opentype.js, zod, fflate : MIT ; flatbush : ISC ;
-  clipper-lib : Boost.
+- three.js, replicad, opentype.js, zod, fflate: MIT; flatbush: ISC;
+  clipper-lib: Boost.
 
-## Origine
+## Origin
 
-C'est le voyant « annonciateur » V5 du Claudemètre, rendu générique. Le
-Claudemètre en est le premier utilisateur, mais l'outil n'en dépend pas.
-Les cotes viennent d'une maquette Fusion 360, gardée dans un dépôt à part ;
-ses sorties de référence (STL, contours de la légende) sont dans
-`core/test/ref/`, où les tests du noyau les comparent à ses pièces.
+It is the V5 “annunciator” light of the Claudemètre, made generic. The
+Claudemètre is its first user, but the tool does not depend on it. The
+dimensions come from a Fusion 360 mock-up, kept in a separate repository;
+its reference outputs (STL, legend outlines) are in `core/test/ref/`,
+where the core tests compare them with its pieces.
+
+An earlier, French-only version of this generator stays available for a
+while: [generateur-temoin-lumineux](https://github.com/docteurzoidberg/generateur-temoin-lumineux).

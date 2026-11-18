@@ -1,20 +1,24 @@
+[English version](../generator.md)
+
 # Spécification du générateur (étapes 3 à 5)
 
-Ce que fait l'outil. Comment il se construit (ordre, pile, dossiers, lots) :
-[plan-generateur.md](plan-generateur.md) ; vocabulaire des pièces :
-[PLAN.md](../PLAN.md). Codé : le preset (`core/src/preset.ts`), la mise en page de la légende
-(`core/src/legend.ts`), les cotes (`core/src/dims.ts`), les pièces
-(`core/src/parts.ts`), les exports (`core/src/exports.ts`), les contrôles
-(`core/src/checks.ts`, `core/src/generate.ts`) et la ligne de commande
-(`cli/`).
+Ce que fait l'outil. Comment il se construit (ordre, pile, dossiers, lots ;
+en anglais) : [generator-plan.md](../generator-plan.md) ; vocabulaire des
+pièces : [PLAN.md](../../PLAN.md). Codé : le preset (`core/src/preset.ts`),
+la mise en page de la légende (`core/src/legend.ts`), les cotes
+(`core/src/dims.ts`), les pièces (`core/src/parts.ts`), les exports
+(`core/src/exports.ts`), les contrôles (`core/src/checks.ts`,
+`core/src/generate.ts`), leurs messages en anglais et en français
+(`core/src/messages.ts`) et la ligne de commande (`cli/`).
 
 ## Preset (réglages de la v1)
 
 Le contrat entre la ligne de commande, le skill et la page, versionné
 (`"version": 1`), figé le 30/10/2026 : schéma zod dans
-[`core/src/preset.ts`](../core/src/preset.ts), JSON Schema dans
-[`presets/schema.json`](../presets/schema.json) (`npm run schema`). Exemple
-complet : [`presets/alarme.json`](../presets/alarme.json). Cotes en mm.
+[`core/src/preset.ts`](../../core/src/preset.ts), JSON Schema dans
+[`presets/schema.json`](../../presets/schema.json) (`npm run schema`,
+descriptions en anglais). Exemple complet :
+[`presets/alarm.json`](../../presets/alarm.json). Cotes en mm.
 
 **La v1 ne règle que ce qui a été validé à l'impression** (décision du
 30/10/2026) : un prototype fonctionnel vite, sans fonction non éprouvée.
@@ -32,7 +36,9 @@ complet : [`presets/alarme.json`](../presets/alarme.json). Cotes en mm.
 
 - **Clé inconnue refusée** (faute de frappe, ou réglage hors v1) ; erreurs
   en lignes « chemin : message », par exemple `mount.head : Option
-  invalide : une valeur parmi "countersunk"|"socket" attendue`.
+  invalide : une valeur parmi "countersunk"|"socket" attendue` (dans la
+  page en français ; en anglais, `mount.head: Invalid option: expected one
+  of "countersunk"|"socket"`).
 - **Évolution** : ajouts compatibles en v1 ; changer une clé ou une valeur
   par défaut fait passer en v2, avec une migration.
 - **Couleurs** : elles servent à l'aperçu et au 3MF ; le filament réel
@@ -61,10 +67,11 @@ l'aperçu (étape 5).
 
 ## Contrôles (calculés en direct)
 
-Codés dans [`core/src/checks.ts`](../core/src/checks.ts), avec
+Codés dans [`core/src/checks.ts`](../../core/src/checks.ts), avec
 `core/src/generate.ts` : ✓, avertissement (⚠, n'empêche pas la génération) ou
 erreur (✗, rien n'est écrit), dans la ligne de commande comme dans la page ;
-chacun porte un code stable pour le skill. Buse de 0,4 ; parois d'au moins
+chacun porte un code stable pour le skill. Messages en anglais, ou en
+français pour la page en français. Buse de 0,4 ; parois d'au moins
 2 largeurs de buse (0,8).
 
 | Code | Contrôle | ⚠ sous | ✗ sous |
@@ -83,7 +90,8 @@ chacun porte un code stable pour le skill. Buse de 0,4 ; parois d'au moins
 | `screw` | une vis M3 du commerce convient (pointe à 0,3 mm du fond du perçage, au moins 60 % de l'insert en prise) | | aucune |
 | `light.leds` | LED extrêmes dans la fenêtre | dépassement | |
 
-ALARME (impression validée) : un seul avertissement, `legend.gaps`, avec
+ALARME (impression validée, preset de la maquette, référence des tests
+`core/test/ref/alarme.json`) : un seul avertissement, `legend.gaps`, avec
 les 4 mêmes zones que la maquette ; elles n'ont pas gêné l'impression.
 
 Plus tard : uniformité de l'éclairage estimée (LED lambertiennes à la
@@ -92,22 +100,22 @@ profondeur de la boîte) ; le modèle simple donne 39 % pour ALARME, qui
 
 ## Page web
 
-Disposition recalée sur le preset v1 (30/10/2026) ; valeurs d'ALARME.
-Lots : [plan-generateur.md](plan-generateur.md), « Étape 5 ».
+Disposition recalée sur le preset v1 (30/10/2026) ; valeurs d'ALARM, page
+en français. Lots : [generator-plan.md](../generator-plan.md), « Step 5 ».
 
 ```text
-┌─ Témoin lumineux ─────────── Ouvrir · Exemples · Enregistrer · Lien ─┐
+┌─ Témoin lumineux ─── Ouvrir · Exemples · Enregistrer · Lien · EN FR ─┐
 │ ┌─ Réglages ─────────────┐ ┌─ Aperçu ──────────────────────────────┐ │
-│ │ Nom        alarme      │ │    ┌─────────────────────────────┐    │ │
-│ │ Texte      ALARME      │ │    │ ○  ┌───────────────────┐  ○ │    │ │
-│ │ Fond       ■ #111111   │ │    │    │       ALARME      │    │    │ │
+│ │ Nom        alarm       │ │    ┌─────────────────────────────┐    │ │
+│ │ Texte      ALARM       │ │    │ ○  ┌───────────────────┐  ○ │    │ │
+│ │ Fond       ■ #111111   │ │    │    │       ALARM       │    │    │ │
 │ │ Fenêtre    27 × 10,5   │ │    │    └───────────────────┘    │    │ │
 │ │ Cadre      47 × 18     │ │    └─────────────────────────────┘    │ │
 │ │ Couleur    ■ #111111   │ │                                       │ │
 │ │ Panneau    3 mm        │ │ 3D · face      lumière : fixe · ambre │ │
 │ │ Tête       fraisée  ▼  │ │ assemblé ─────●───── éclaté           │ │
 │ │ Fils       à gauche ▼  │ ├─ Contrôles ───────────────────────────┤ │
-│ └────────────────────────┘ │ ✓ légende : capitales de 5,36 mm      │ │
+│ └────────────────────────┘ │ ✓ légende : capitales de 6,47 mm      │ │
 │ ┌─ Montage ──────────────┐ │ ⚠ 4 espaces du masque < buse          │ │
 │ │ découpe 29,8 × 13,3    │ │ ✓ montage, vis M3 × 10, 4 LED         │ │
 │ │ 2 trous Ø 3,4 à 37     │ ├─ Télécharger ─────────────────────────┤ │
@@ -153,7 +161,12 @@ Lots : [plan-generateur.md](plan-generateur.md), « Étape 5 ».
   en un zip ; calculés au clic. Preset et STEP identiques à ceux de la
   commande ; STL et 3MF de même géométrie (OpenCascade peut couper un
   quadrilatère plat par l'autre diagonale dans le navigateur).
-- **Thème** clair ou sombre : celui du système par défaut, bouton « Sombre »
+- **Langue** : anglais ou français. Celle du navigateur si c'est l'une des
+  deux, sinon l'anglais ; choix EN / FR dans l'en-tête, gardé dans le
+  navigateur et appliqué sur place, sans rechargement. Textes de la page
+  dans `web/src/texts.ts` ; contrôles et résumé viennent du noyau dans la
+  même langue ; `licenses.txt` et les fichiers produits restent en anglais.
+- **Thème** clair ou sombre : celui du système par défaut, interrupteur
   dans l'en-tête pour changer, choix gardé dans le navigateur.
 - **Hors ligne** une fois chargée (service worker de la page construite,
   pas en développement).
@@ -165,11 +178,14 @@ Lots : [plan-generateur.md](plan-generateur.md), « Étape 5 ».
 
 ## Sorties
 
+Noms des fichiers et des pièces en anglais, quelle que soit la langue de la
+page.
+
 | Fichier | Contenu |
 | --- | --- |
-| `<nom>_<impression>.3mf` | 3MF génériques, un par impression : `legende` (un objet de 2 pièces, masque et voile, à charger ensemble), `cadre`, `boite_fond`, `panneau_essai` ; pièces orientées, une par couleur ; à trancher dans le logiciel de son choix |
-| `<nom>_<pièce>.stl` | `cadre`, `legende_masque`, `legende_voile`, `boite`, `fond`, `panneau_essai`, orientés et posés comme les 3MF |
-| `<nom>.step` | assemblage nommé et coloré (cadre, masque, voile, boite, fond), solides exacts dans le repère du témoin |
+| `<nom>_<impression>.3mf` | 3MF génériques, un par impression : `legend` (un objet de 2 pièces, masque et voile, à charger ensemble), `frame`, `box_cover`, `test_panel` ; pièces orientées, une par couleur ; à trancher dans le logiciel de son choix |
+| `<nom>_<pièce>.stl` | `frame` (cadre), `legend_mask` (masque), `legend_veil` (voile), `box` (boîte), `cover` (fond), `test_panel` (panneau d'essai), orientés et posés comme les 3MF |
+| `<nom>.step` | assemblage nommé et coloré (frame, mask, veil, box, cover), solides exacts dans le repère du témoin |
 | `<nom>.json` | le preset utilisé, valeurs par défaut comprises |
 
 Fichiers identiques d'une génération à l'autre. Plus tard, chacun après
@@ -186,15 +202,15 @@ Tranchage hors périmètre : aucun réglage propre à un logiciel de tranchage
 ## Ligne de commande (étape 3) et skill (étape 4)
 
 Codée dans `cli/bin/indicator.ts` ; installée pour tous les projets par
-`cd cli && npm link` (fait le 30/10/2026, Node 22.18 sous nvm : à refaire
-après un changement de version de Node) ; sinon, depuis ce dépôt :
-`node cli/bin/indicator.ts …` ou `npm run indicator -- …`.
+`cd cli && npm link` (à refaire après un changement de version de Node) ;
+sinon, depuis ce dépôt : `node cli/bin/indicator.ts …` ou
+`npm run indicator -- …`. Sortie en anglais.
 
 ```bash
-indicator check presets/alarme.json             # contrôles et résumé, rien n'est écrit
-indicator check presets/alarme.json --json      # le même en JSON, pour le skill
-indicator generate presets/alarme.json          # fichiers dans export/, à côté du preset
-indicator generate presets/alarme.json -o out/  # ailleurs
+indicator check presets/alarm.json             # contrôles et résumé, rien n'est écrit
+indicator check presets/alarm.json --json      # le même en JSON, pour le skill
+indicator generate presets/alarm.json          # fichiers dans export/, à côté du preset
+indicator generate presets/alarm.json -o out/  # ailleurs
 ```
 
 - `<nom>` = nom du fichier preset sans `.json` ; code de sortie 0 (bon),
@@ -218,4 +234,4 @@ court, le calcul restant dans l'outil :
    gabarit).
 
 Exemple : depuis le Claudemètre, « génère le témoin du claudemètre » →
-preset `design/temoin/claude.json`, fichiers dans `design/temoin/export/`.
+preset `design/indicator/claude.json`, fichiers dans `design/indicator/export/`.
