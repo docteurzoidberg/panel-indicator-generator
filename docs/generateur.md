@@ -119,8 +119,8 @@ Lots : [plan-generateur.md](plan-generateur.md), « Étape 5 ».
 ```
 
 - **Réglages** : les 8 clés du preset v1, et le nom des fichiers (celui du
-  preset ouvert, comme `temoin`, sinon le texte en minuscules). Contrôles et
-  montage recalculés à chaque saisie, avec les lignes de `temoin check` ;
+  preset ouvert, comme `indicator`, sinon le texte en minuscules). Contrôles et
+  montage recalculés à chaque saisie, avec les lignes de `indicator check` ;
   une erreur du preset est aussi montrée sous son champ, et bloque le
   téléchargement.
 - **3D**, vue par défaut (recalculée après une pause de saisie, chaque
@@ -139,17 +139,17 @@ Lots : [plan-generateur.md](plan-generateur.md), « Étape 5 ».
   modèle d'éclairage ; effets fixes si le système réduit les animations.
 - **Presets** : ouvrir un JSON (choisi ou glissé sur la page, par exemple le
   preset d'un projet hôte, pour voir son aperçu), l'enregistrer, preset dans
-  l'URL, exemples. Pas de `temoin preview` : la page est la visionneuse.
-  Un preset ouvert est contrôlé tel quel, comme par `temoin check`, jusqu'à
+  l'URL, exemples. Pas de `indicator preview` : la page est la visionneuse.
+  Un preset ouvert est contrôlé tel quel, comme par `indicator check`, jusqu'à
   la première saisie ; le formulaire garde ensuite les valeurs fausses de
   ses champs jusqu'à leur saisie et abandonne les clés inconnues. Nom des
   fichiers : celui du fichier ouvert ou du lien ; un exemple repart du
-  texte. Enregistrer donne le `<nom>.json` de `temoin generate` (valeurs par
+  texte. Enregistrer donne le `<nom>.json` de `indicator generate` (valeurs par
   défaut comprises, sans `$schema`), et seulement pour un preset valide. Le
   lien porte le preset dans le fragment de l'URL, jamais envoyé au serveur :
   `#name=claude&version=1&legend.text=CLAUDE&…&light.wireExit=left`, tenu à
   jour à chaque saisie.
-- **Télécharger** : les fichiers de `temoin generate` (voir « Sorties »),
+- **Télécharger** : les fichiers de `indicator generate` (voir « Sorties »),
   identiques, en un zip ; calculés au clic.
 - **Thème** clair ou sombre : celui du système par défaut, bouton « Sombre »
   dans l'en-tête pour changer, choix gardé dans le navigateur.
@@ -157,7 +157,7 @@ Lots : [plan-generateur.md](plan-generateur.md), « Étape 5 ».
   pas en développement).
 - **Licences** en pied de page : OpenCascade (LGPL 2.1, fichier `.wasm` à
   part, lien vers ses sources), polices Barlow Condensed et B612 (OFL), et
-  `licences.txt` avec le texte de chaque licence.
+  `licenses.txt` avec le texte de chaque licence.
 - Plus tard : coupe, zones fines surlignées, lueur selon le modèle
   d'uniformité, et les réglages hors v1.
 
@@ -183,16 +183,16 @@ Tranchage hors périmètre : aucun réglage propre à un logiciel de tranchage
 
 ## Ligne de commande (étape 3) et skill (étape 4)
 
-Codée dans `cli/bin/temoin.ts` ; installée pour tous les projets par
+Codée dans `cli/bin/indicator.ts` ; installée pour tous les projets par
 `cd cli && npm link` (fait le 30/10/2026, Node 22.18 sous nvm : à refaire
 après un changement de version de Node) ; sinon, depuis ce dépôt :
-`node cli/bin/temoin.ts …` ou `npm run temoin -- …`.
+`node cli/bin/indicator.ts …` ou `npm run indicator -- …`.
 
 ```bash
-temoin check presets/alarme.json             # contrôles et résumé, rien n'est écrit
-temoin check presets/alarme.json --json      # le même en JSON, pour le skill
-temoin generate presets/alarme.json          # fichiers dans export/, à côté du preset
-temoin generate presets/alarme.json -o out/  # ailleurs
+indicator check presets/alarme.json             # contrôles et résumé, rien n'est écrit
+indicator check presets/alarme.json --json      # le même en JSON, pour le skill
+indicator generate presets/alarme.json          # fichiers dans export/, à côté du preset
+indicator generate presets/alarme.json -o out/  # ailleurs
 ```
 
 - `<nom>` = nom du fichier preset sans `.json` ; code de sortie 0 (bon),
@@ -202,13 +202,13 @@ temoin generate presets/alarme.json -o out/  # ailleurs
   (entraxe), fichiers écrits ; environ 3,5 s. En JSON : `{ name, ok, checks,
   summary, out, files }`, cotes du résumé arrondies au µm.
 
-Skill global `temoin-lumineux` (source dans `skill/`, liée depuis
-`~/.claude/skills/temoin-lumineux` ; mode d'emploi : [skill.md](skill.md)),
+Skill global `panel-indicator` (source dans `skill/`, liée depuis
+`~/.claude/skills/panel-indicator` ; mode d'emploi : [skill.md](skill.md)),
 court, le calcul restant dans l'outil :
 
 1. trouver le preset du projet courant, ou en créer un depuis un exemple en
    posant les questions qui manquent ;
-2. `temoin check --json`, puis `temoin generate` vers le dossier d'export du
+2. `indicator check --json`, puis `indicator generate` vers le dossier d'export du
    projet ;
 3. résumer contrôles, nomenclature et fichiers écrits ;
 4. sur demande : intégrer le témoin dans le design hôte

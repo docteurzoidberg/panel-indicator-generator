@@ -1,5 +1,5 @@
 {
-  "name": "generateur-temoin-lumineux",
+  "name": "panel-indicator-generator",
   "private": true,
   "license": "WTFPL",
   "type": "module",
@@ -13,8 +13,8 @@
     "test": "vitest run",
     "typecheck": "tsc -p core && tsc -p cli && tsc -p web",
     "schema": "node core/scripts/schema.ts",
-    "temoin": "node cli/bin/temoin.ts",
-    "web": "npm run dev -w @temoin/web"
+    "indicator": "node cli/bin/indicator.ts",
+    "web": "npm run dev -w @indicator/web"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

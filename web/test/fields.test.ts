@@ -1,6 +1,6 @@
 // Form built from the preset schema: every setting has its field, and nothing else.
 import { expect, test } from 'vitest';
-import { presetJsonSchema } from '@temoin/core';
+import { presetJsonSchema } from '@indicator/core';
 import { leaves, rows, type SchemaNode } from '../src/fields.ts';
 
 const schema = presetJsonSchema() as SchemaNode;

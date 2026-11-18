@@ -1,7 +1,7 @@
 // Messages between the page (main.ts) and its two workers: checks (checker.ts, without
 // OpenCascade, on every input) and the OpenCascade engine (engine.ts, through
 // engine-client.ts: 3D preview and files).
-import type { Check, PreviewPart } from '@temoin/core';
+import type { Check, PreviewPart } from '@indicator/core';
 import type { FaceModel } from './face-model.ts';
 
 export type ToChecker = { id: number; preset: unknown };
@@ -10,9 +10,9 @@ export type FromChecker = {
   id: number;
   ok: boolean;                        // no error: generation is possible
   checks: Check[];
-  summary?: [string, string][];       // mounting, like the summary of temoin check
+  summary?: [string, string][];       // mounting, like the summary of indicator check
   face?: FaceModel;                   // as soon as the preset is valid, even if mounting fails
-  json?: string;                      // preset to save (the <name>.json of temoin generate), as soon as it is valid
+  json?: string;                      // preset to save (the <name>.json of indicator generate), as soon as it is valid
 };
 
 export type EngineRequest =

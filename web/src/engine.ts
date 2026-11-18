@@ -2,12 +2,12 @@
 // computes on request the 3D preview of a preset (meshes cached per piece) or its files,
 // delivered as a zip. Every reply carries the heap size, which never shrinks: engine-client.ts
 // replaces a worker grown too big.
-// OpenCascade's .wasm stays a separately served file (LGPL licence).
+// OpenCascade's .wasm stays a separately served file (LGPL license).
 import opencascade from 'replicad-opencascadejs';
 import wasmUrl from 'replicad-opencascadejs/wasm?url';
 import { getOC, setOC } from 'replicad';
 import { zipSync, type Zippable } from 'fflate';
-import { dimensions, generate, layoutLegend, parseFont, parsePreset, previewParts, type PreviewCache } from '@temoin/core';
+import { dimensions, generate, layoutLegend, parseFont, parsePreset, previewParts, type PreviewCache } from '@indicator/core';
 import fontUrl from '../../fonts/BarlowCondensed-SemiBold.ttf?url';   // LEGEND.fontFile
 import type { EngineReply, FromEngine, ToEngine } from './protocol.ts';
 

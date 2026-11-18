@@ -1,5 +1,5 @@
 {
-  "name": "@temoin/web",
+  "name": "@indicator/web",
   "version": "0.1.0",
   "private": true,
   "license": "WTFPL",
@@ -13,7 +13,7 @@
   "dependencies": {
     "@fontsource/b612": "^5.3.0",
     "@fontsource/b612-mono": "^5.3.0",
-    "@temoin/core": "0.1.0",
+    "@indicator/core": "0.1.0",
     "fflate": "^0.8.3",
     "replicad": "^1.2.1",
     "replicad-opencascadejs": "^1.2.1",

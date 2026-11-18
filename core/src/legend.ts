@@ -1,7 +1,7 @@
-// Legend: the preset text as ink polygons, in mm, origin at the centre of the window, x
+// Legend: the preset text as ink polygons, in mm, origin at the center of the window, x
 // to the right, y up. Port of the mock-up's legende_dxf.py (same result, checked by the
 // tests): glyphs flattened into segments of at most STEP mm, tracking as a fraction of the
-// cap height, no kerning, capitals centred, "auto" height = the largest for which the ink
+// cap height, no kerning, capitals centered, "auto" height = the largest for which the ink
 // stays MARGIN away from the window edge. No OpenCascade: also used by the front view and
 // the checks.
 /// <reference path="./opentype.d.ts" />

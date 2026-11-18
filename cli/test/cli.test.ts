@@ -1,11 +1,11 @@
-// The temoin command, run for real: exit codes, messages, written files.
+// The indicator command, run for real: exit codes, messages, written files.
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 
-const BIN = new URL('../bin/temoin.ts', import.meta.url).pathname;
+const BIN = new URL('../bin/indicator.ts', import.meta.url).pathname;
 const ALARM = new URL('../../presets/alarme.json', import.meta.url).pathname;
 const run = (...args: string[]) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
 
@@ -13,12 +13,12 @@ function presetFile(change: (p: any) => void): string {
   const p = JSON.parse(readFileSync(ALARM, 'utf8'));
   delete p.$schema;
   change(p);
-  const f = join(mkdtempSync(join(tmpdir(), 'temoin-')), 'sample.json');
+  const f = join(mkdtempSync(join(tmpdir(), 'indicator-')), 'sample.json');
   writeFileSync(f, JSON.stringify(p));
   return f;
 }
 
-describe('temoin check', () => {
+describe('indicator check', () => {
   test('alarme: valid, hardware summary', () => {
     const r = run('check', ALARM);
     expect(r.status).toBe(0);
@@ -48,7 +48,7 @@ describe('temoin check', () => {
   });
 });
 
-test('temoin generate: 12 files in export/ next to the preset', () => {
+test('indicator generate: 12 files in export/ next to the preset', () => {
   const f = presetFile((p) => { p.legend.text = 'CAFÉ'; });
   const r = run('generate', f);
   expect(r.status, r.stderr).toBe(0);

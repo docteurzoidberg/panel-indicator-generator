@@ -17,7 +17,7 @@ export interface Summary {
   window: [number, number];
   frame: [number, number];
   panel: number;
-  cutout: { size: [number, number]; holes: { count: 2; diameter: number; spacing: number } };   // to drill in the panel, centred on the window
+  cutout: { size: [number, number]; holes: { count: 2; diameter: number; spacing: number } };   // to drill in the panel, centered on the window
   screws: { count: 2; size: 'M3'; length: number; head: Preset['mount']['head'] };
   inserts: { count: 2; size: 'M3'; hole: [number, number] };   // hole Ø and depth
   leds: { count: number; stripLength: number; ledsPerMeter: number; wireExit: Preset['light']['wireExit'] };

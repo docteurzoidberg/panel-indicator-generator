@@ -54,10 +54,10 @@ function mountRules(d: Dimensions): Check[] {
   return checks;
 }
 
-// Frame (and screw spacing, centred between the window and the edge) of w × h.
+// Frame (and screw spacing, centered between the window and the edge) of w × h.
 const withFrame = (d: Dimensions, w: number, h: number): Dimensions => ({ ...d, frameW: w, frameH: h, screwSpacing: (d.windowW + w) / 2 });
 
-// Smallest frame, to the half millimetre, for which the mounting rules pass without a
+// Smallest frame, to the half millimeter, for which the mounting rules pass without a
 // warning: the fix suggested when one of them fails.
 function minimalFrame(d: Dimensions): [number, number] {
   const fine = (w: number, h: number) => mountRules(withFrame(d, w, h)).every((c) => c.level === 'ok');

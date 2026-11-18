@@ -15,11 +15,11 @@ page ne le fige.
 
 | Étape | Livrable | Terminée quand |
 | --- | --- | --- |
-| 3 | noyau `core/`, ligne de commande `cli/` | le preset `alarme` redonne les pièces de la maquette (parité) ; `temoin check` et `generate` marchent *(fait le 30/10/2026)* |
+| 3 | noyau `core/`, ligne de commande `cli/` | le preset `alarme` redonne les pièces de la maquette (parité) ; `indicator check` et `generate` marchent *(fait le 30/10/2026)* |
 | 4 | skill global `skill/` | le témoin du Claudemètre est généré depuis son dépôt *(fait le 30/10/2026)* |
 | 5 | page web `web/` | réglages ou preset ouvert, aperçu et téléchargements, hors ligne ; pour un même preset, mêmes fichiers que la ligne de commande |
 
-La v0 du skill sur les scripts Fusion, envisagée, est abandonnée. `temoin
+La v0 du skill sur les scripts Fusion, envisagée, est abandonnée. `indicator
 preview` aussi (30/10/2026) : la commande sert surtout au skill et aux
 projets hôtes, qui ne regardent pas de page ; pour voir un témoin, on ouvre
 son preset dans la page web (ou son STEP dans Fusion).
@@ -36,10 +36,10 @@ projets hôtes (Claudemètre)                  un humain
              │                                   │
    ┌─────────▼──────────┐              ┌─────────▼──────────┐
    │ skill global       │              │ page web statique  │
-   │ temoin-lumineux    │              │ réglages, aperçu,  │
+   │ panel-indicator    │              │ réglages, aperçu,  │
    └─────────┬──────────┘              │ téléchargements    │
    ┌─────────▼──────────┐              └─────────┬──────────┘
-   │ CLI temoin (Node)  │                        │
+   │ CLI indicator (Node)  │                        │
    │ check · generate   │                        │
    └─────────┬──────────┘                        │
              └─────────────────┬─────────────────┘
@@ -64,9 +64,9 @@ generate(preset: Preset, fonts: FontBytes): {
 | Dossier | Contenu |
 | --- | --- |
 | `core/` | preset (schéma, valeurs par défaut, migration de version, JSON Schema publié) ; catalogues (vis, inserts, longueurs du commerce, rubans, LED) ; légende ; pièces ; orientation pour l'impression ; contrôles ; exports |
-| `cli/` | commande `temoin` : arguments, lecture du preset et des polices, écriture des fichiers, sortie `--json` pour le skill |
+| `cli/` | commande `indicator` : arguments, lecture du preset et des polices, écriture des fichiers, sortie `--json` pour le skill |
 | `web/` | page Vite : formulaire tiré du schéma, preset ouvert depuis un fichier, noyau dans un Web Worker, aperçu three.js (éclaté ou assemblé, éteint ou allumé, tiré de la vue éclatée de la maquette), téléchargement en zip, preset dans l'URL, hors ligne (service worker) |
-| `skill/` | `SKILL.md`, court : le calcul reste dans `temoin` |
+| `skill/` | `SKILL.md`, court : le calcul reste dans `indicator` |
 
 Un seul dépôt en espaces de travail npm (`core`, `cli`, puis `web`) ;
 `presets/` et `fonts/` sont partagés. Chaque dossier est créé au début de
@@ -108,7 +108,7 @@ contrôles.
 | 3.3 Pièces *(fait le 30/10/2026)* | cadre, légende (masque ; voile et lettres d'un corps), boîte, fond, panneau d'essai (`core/src/parts.ts`) ; cotes et vis reprises de `temoin.py` (maquette) (`core/src/dims.ts`) | parité avec les STL de la maquette : volume à 0,05 % et encombrement à 0,01 mm (écart constaté : 0,012 % au plus, encombrements identiques) ; tête cylindrique et fils à droite vérifiés à part |
 | 3.4 Contrôles *(fait le 30/10/2026)* | ceux de la spécification, un code chacun, et le cadre conseillé quand le montage échoue (`core/src/checks.ts`) ; uniformité de l'éclairage reportée (modèle à recaler) | ALARME : mêmes zones fines que `legende_dxf.py`, aucune erreur ; cas d'école : cadre trop petit, fenêtre trop large, LED hors de la fenêtre, vis introuvable |
 | 3.5 Exports *(fait le 30/10/2026, avant 3.4)* | STL et 3MF (reprise de `orient_stl.py` et `export_3mf.py`), STEP en un assemblage nommé, preset ; fichiers déterministes (`core/src/exports.ts`). Gabarit et nomenclature en fichier : plus tard | STL posés comme ceux de la maquette (bornes à 0,01 mm) ; 3MF lus ; STEP relu (volumes exacts, couleurs) ; 2 générations identiques. Reste : 3MF ouvert par l'utilisateur dans son logiciel de tranchage |
-| 3.6 Ligne de commande *(fait le 30/10/2026, avant 3.4)* | `temoin check`, `generate`, `--json`, codes de sortie (`cli/bin/temoin.ts`) ; installation globale à l'étape 4 | lancée pour de vrai par les tests : alarme, presets faux, génération complète |
+| 3.6 Ligne de commande *(fait le 30/10/2026, avant 3.4)* | `indicator check`, `generate`, `--json`, codes de sortie (`cli/bin/indicator.ts`) ; installation globale à l'étape 4 | lancée pour de vrai par les tests : alarme, presets faux, génération complète |
 
 ### Prototype du moteur (lot 3.0, fait le 30/10/2026) : replicad retenu
 
@@ -166,14 +166,14 @@ Leçons pour la suite :
 Tolérances de parité (lot 3.3) : volume à 0,05 %, encombrement à 0,01 mm.
 Parité atteinte le 30/10/2026 : le noyau devient la référence ; la maquette
 Fusion reste l'étalon des tests. Une impression de contrôle d'un
-témoin sorti de `temoin`, si l'utilisateur la veut, clôt l'étape.
+témoin sorti de `indicator`, si l'utilisateur la veut, clôt l'étape.
 
 ## Étape 4 : skill
 
 - `skill/SKILL.md` d'après [skill.md](skill.md) ; lien
-  `~/.claude/skills/temoin-lumineux` posé à l'écriture *(fait le
+  `~/.claude/skills/panel-indicator` posé à l'écriture *(fait le
   30/10/2026, skill vu depuis le Claudemètre)*.
-- `temoin` appelé tel qu'installé par `npm link` *(fait, marche depuis
+- `indicator` appelé tel qu'installé par `npm link` *(fait, marche depuis
   n'importe quel dossier)* ; résumé complété de la découpe et de l'entraxe
   à percer dans le panneau, utiles à l'intégration.
 - Questions tirées du preset v1 (table des clés recopiée dans `SKILL.md`).
@@ -190,19 +190,19 @@ témoin sorti de `temoin`, si l'utilisateur la veut, clôt l'étape.
 Branche `etape-5-web` ; lots validés le 30/10/2026. Disposition et vues :
 [generateur.md](generateur.md), section « Page web ». La page ouvre aussi
 les presets des projets hôtes (fichier choisi ou glissé, par exemple
-`design/temoin/claude.json`) : c'est leur aperçu, à la place de `temoin
+`design/temoin/claude.json`) : c'est leur aperçu, à la place de `indicator
 preview`.
 
 | Lot | Contenu | Contrôle |
 | --- | --- | --- |
-| 5.1 Noyau dans la page *(fait le 30/10/2026)* | espace de travail `web/` (Vite) ; Web Worker qui démarre OpenCascade dès le chargement (recette du prototype du lot 3.0) ; un bouton génère et télécharge le zip d'`alarme` | test commun : fichiers du zip identiques, octet pour octet, à ceux de `temoin generate`, dans Chromium headless (Playwright) ; temps comparés au prototype |
-| 5.2 Réglages et contrôles *(fait le 30/10/2026)* | formulaire des 8 clés (types, bornes, défauts et options lus dans le schéma zod, libellés en français) ; contrôles et montage (découpe, vis, LED) en direct, sans OpenCascade ; vue de face 2D en SVG, éteinte ou allumée | ALARME : mêmes lignes que `temoin check` ; cas d'école du lot 3.4 ; un test échoue si une clé du schéma n'a pas de champ |
-| 5.3 Presets *(fait le 30/10/2026)* | ouvrir un `.json` (choisi ou glissé), l'enregistrer, lien avec le preset dans l'URL, exemples de `presets/` ; nom des fichiers = nom du preset ouvert, sinon champ « Nom » (par défaut le texte en minuscules) | `claude.json` du Claudemètre : contrôles de `temoin check` ; lien rouvert → même preset ; preset faux → erreurs « chemin : message » |
+| 5.1 Noyau dans la page *(fait le 30/10/2026)* | espace de travail `web/` (Vite) ; Web Worker qui démarre OpenCascade dès le chargement (recette du prototype du lot 3.0) ; un bouton génère et télécharge le zip d'`alarme` | test commun : fichiers du zip identiques, octet pour octet, à ceux de `indicator generate`, dans Chromium headless (Playwright) ; temps comparés au prototype |
+| 5.2 Réglages et contrôles *(fait le 30/10/2026)* | formulaire des 8 clés (types, bornes, défauts et options lus dans le schéma zod, libellés en français) ; contrôles et montage (découpe, vis, LED) en direct, sans OpenCascade ; vue de face 2D en SVG, éteinte ou allumée | ALARME : mêmes lignes que `indicator check` ; cas d'école du lot 3.4 ; un test échoue si une clé du schéma n'a pas de champ |
+| 5.3 Presets *(fait le 30/10/2026)* | ouvrir un `.json` (choisi ou glissé), l'enregistrer, lien avec le preset dans l'URL, exemples de `presets/` ; nom des fichiers = nom du preset ouvert, sinon champ « Nom » (par défaut le texte en minuscules) | `claude.json` du Claudemètre : contrôles de `indicator check` ; lien rouvert → même preset ; preset faux → erreurs « chemin : message » |
 | 5.4 Aperçu 3D *(fait le 30/10/2026)* | maillages des pièces dans le repère du témoin, ajoutés au noyau ; recalcul dans le worker après une pause de saisie, résultats périmés jetés ; visionneuse tirée de la vue éclatée de la maquette (three.js de npm) : éclaté ou assemblé, éteint ou allumé, panneau d'essai, pièces masquables | ALARME et CLAUDE comparés à `eclate.html` ; légende recalculée en moins de 0,5 s ; mémoire du worker stable sur 50 recalculs |
 | 5.5 Hors ligne *(fait le 31/10/2026)* | service worker (page, worker, WASM de 23 Mo, police) ; polices de l'interface servies par la page ; licences citées (OpenCascade LGPL-2.1 et lien vers ses sources, polices OFL) | page construite, rechargée sans réseau : aperçu et zip marchent |
 
 Lot 5.1 : les 12 fichiers d'`alarme` sortent de la page en 3,4 s
-(`temoin generate` : 3,25 s), OpenCascade prêt 1,1 s après le chargement
+(`indicator generate` : 3,25 s), OpenCascade prêt 1,1 s après le chargement
 (serveur de développement) ; worker de 0,86 Mo, WASM de 23 Mo à part. Le
 test commun (`web/test/parity.test.ts`, dans `npm test`) a trouvé un défaut
 du noyau : OpenCascade écrit les couleurs du STEP dans un ordre qui dépend
@@ -216,21 +216,21 @@ montage et vue de face dans un second worker sans OpenCascade
 (`web/src/checker.ts`, environ 50 ms par saisie), le fil principal sans le
 noyau (10 Ko). Le noyau rend désormais cotes et légende même quand le
 montage échoue (aperçu d'un cadre trop petit), et le résumé du montage
-(`summaryLines`) sert à la page comme à `temoin`. Test de la page : ALARME
-et 4 cas d'école donnent les lignes de `temoin check`. À reprendre au lot
+(`summaryLines`) sert à la page comme à `indicator`. Test de la page : ALARME
+et 4 cas d'école donnent les lignes de `indicator check`. À reprendre au lot
 5.5 : le worker des contrôles embarque replicad sans s'en servir (0,7 Mo).
 
 Lot 5.3 : barre « Ouvrir · Exemples · Enregistrer · Lien » dans l'en-tête,
 fichier glissé n'importe où sur la page. Un preset ouvert (fichier, exemple,
 lien) est contrôlé tel quel jusqu'à la première saisie : la page donne les
-lignes de `temoin check`, même pour un preset faux (clé inconnue, version) ;
+lignes de `indicator check`, même pour un preset faux (clé inconnue, version) ;
 ensuite, le formulaire prend la main, garde les valeurs fausses de ses
 champs (couleur « rouge », option inconnue) jusqu'à leur saisie et abandonne
-les clés qu'il n'a pas. Enregistrer écrit le `<nom>.json` de `temoin
+les clés qu'il n'a pas. Enregistrer écrit le `<nom>.json` de `indicator
 generate` (`presetJson`, désormais dans le noyau). Le lien suit chaque
 saisie (fragment de l'URL, une clé par paramètre, `frame.width=47`, plus
 `name`) : la page rechargée garde son preset. Contrôles : `claude.json` du
-Claudemètre donne les 10 lignes de `temoin check`, lien rouvert compris ;
+Claudemètre donne les 10 lignes de `indicator check`, lien rouvert compris ;
 tests de la page (`page.test.ts`) : preset ouvert, enregistré, lien copié
 puis rouvert dans une autre page, preset faux glissé, exemple ;
 `link.test.ts` pour l'aller-retour du lien. Un seul exemple dans
@@ -285,7 +285,7 @@ Mono (paquets `@fontsource`, OFL), jusque-là demandées au système, donc
 remplacées le plus souvent ; plus larges, elles ont fait rétrécir la
 colonne des libellés (9 em) pour que les champs numériques montrent 6
 caractères. Licences : pied de page (OpenCascade, LGPL 2.1, lien vers
-ses sources ; polices OFL) et `licences.txt`, construit depuis les
+ses sources ; polices OFL) et `licenses.txt`, construit depuis les
 dépendances de `web/` et `core/` (la licence de chaque paquet, la note
 des sources d'OpenCascade, l'OFL de Barlow), servi aussi en
 développement ; l'option `build.license` de Vite ne voit pas les
@@ -331,5 +331,5 @@ touches haut et bas restent) : elles cachaient « 10.5 ».
       message d'échec donne désormais l'état de la page et sa console.
 - [x] Moteur : replicad, d'après le prototype du 30/10/2026 (lot 3.0).
 - [x] Tolérances de parité : volume à 0,05 %, encombrement à 0,01 mm (lot 3.3).
-- [x] `npm link` pour appeler `temoin` depuis le skill, chemin absolu en
+- [x] `npm link` pour appeler `indicator` depuis le skill, chemin absolu en
       repli (étape 4, 30/10/2026).

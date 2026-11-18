@@ -1,5 +1,5 @@
 // Service worker of the built page: keeps the page, its workers, OpenCascade's .wasm, the
-// fonts and the licences, so that the page works offline once loaded. The build
+// fonts and the licenses, so that the page works offline once loaded. The build
 // (vite.config.ts) writes it to sw.js after CACHE, named after the files, and FILES, every
 // file of the page. A new version waits until the page is closed everywhere: an open page
 // keeps finding its own files. Plain JavaScript: copied as is by the build.
@@ -11,7 +11,7 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(caches.keys()
-    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('temoin-') && k !== CACHE).map((k) => caches.delete(k))))
+    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('indicator-') && k !== CACHE).map((k) => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 

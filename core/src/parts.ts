@@ -13,7 +13,7 @@ import type { LegendLayout, Ring } from './legend.ts';
 type Pt = [number, number, number];
 
 // Prism of a drawing in the front plane (x, z), from y0 to y1 > y0 (y towards the wall).
-// The plane goes through origin, centre of an optional scaling (cone).
+// The plane goes through origin, center of an optional scaling (cone).
 function prism(d: Drawing, y0: number, y1: number, origin: [number, number] = [0, 0], endFactor?: number): Shape3D {
   const opts = { extrusionDirection: [0, 1, 0] as Pt, ...(endFactor ? { extrusionProfile: { profile: 'linear' as const, endFactor } } : {}) };
   return d.sketchOnPlane('XZ', [origin[0], y0, origin[1]]).extrude(y1 - y0, opts) as Shape3D;

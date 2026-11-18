@@ -1,19 +1,19 @@
 ---
-name: temoin-lumineux
-description: Témoins lumineux encastrables imprimés en 3D (légende éclairée par un ruban WS2812B, dans un cadre vissé sur une découpe de panneau) pour n'importe quel projet. Décrit le témoin dans un preset JSON du projet (design/temoin/<nom>.json), le contrôle, produit les fichiers d'impression et de montage (3MF génériques, STL, STEP, nomenclature) avec la commande `temoin`, et sur demande l'intègre dans le design Fusion du projet. À charger pour « fais / génère / vérifie un témoin lumineux, un voyant, une légende éclairée », ou dès qu'un preset de témoin est en jeu.
+name: panel-indicator
+description: Témoins lumineux encastrables imprimés en 3D (légende éclairée par un ruban WS2812B, dans un cadre vissé sur une découpe de panneau) pour n'importe quel projet. Décrit le témoin dans un preset JSON du projet (design/temoin/<nom>.json), le contrôle, produit les fichiers d'impression et de montage (3MF génériques, STL, STEP, nomenclature) avec la commande `indicator`, et sur demande l'intègre dans le design Fusion du projet. À charger pour « fais / génère / vérifie un témoin lumineux, un voyant, une légende éclairée », ou dès qu'un preset de témoin est en jeu.
 ---
 
 # Témoin lumineux
 
-Le calcul est dans la commande `temoin` du générateur : le dépôt dont `skill/` est la cible
-du lien `~/.claude/skills/temoin-lumineux`.
+Le calcul est dans la commande `indicator` du générateur : le dépôt dont `skill/` est la cible
+du lien `~/.claude/skills/panel-indicator`.
 Ce skill la pilote depuis le projet hôte et n'écrit que dans ce projet.
 
 ## Commande
 
 ```bash
-temoin check <preset.json> --json                  # contrôles seuls, rien n'est écrit
-temoin generate <preset.json> [-o <dossier>] --json # contrôles puis fichiers
+indicator check <preset.json> --json                  # contrôles seuls, rien n'est écrit
+indicator generate <preset.json> [-o <dossier>] --json # contrôles puis fichiers
 ```
 
 - Sans `-o` : fichiers dans `export/` à côté du preset ; `<nom>` du fichier preset préfixe tout.
@@ -21,8 +21,8 @@ temoin generate <preset.json> [-o <dossier>] --json # contrôles puis fichiers
 - JSON : `{ name, ok, checks: [{ level: ok|warn|error, code, message }], summary, out, files }` ;
   `summary` : `capHeight`, `window`, `frame`, `panel`, `cutout` (découpe et trous du panneau),
   `screws`, `inserts`, `leds`.
-- `temoin` introuvable : `cd "$(realpath ~/.claude/skills/temoin-lumineux)/../cli" && npm link`
-  (Node 22.18 ou plus) ; sinon `node "$(realpath ~/.claude/skills/temoin-lumineux)/../cli/bin/temoin.ts" …`.
+- `indicator` introuvable : `cd "$(realpath ~/.claude/skills/panel-indicator)/../cli" && npm link`
+  (Node 22.18 ou plus) ; sinon `node "$(realpath ~/.claude/skills/panel-indicator)/../cli/bin/indicator.ts" …`.
 
 ## Preset (version 1)
 
@@ -64,12 +64,12 @@ le plus proche en v1, ne jamais contourner (clé inventée, fichier retouché).
    créer un : demander le texte et l'épaisseur du panneau, puis proposer pour le reste la
    valeur par défaut ou celle que le projet suggère (sa documentation, ses cotes) ;
    l'écrire après accord.
-2. **Contrôles** : `temoin check <preset> --json`.
+2. **Contrôles** : `indicator check <preset> --json`.
    - `error` : s'arrêter, expliquer, proposer la correction du preset (`mount.frame` donne
      le plus petit cadre qui passe) ; l'appliquer seulement après accord, puis recontrôler.
    - `warn` : continuer ; le signaler dans le résumé (les espaces du masque plus fins que la
      buse sont courants et n'ont pas gêné l'impression).
-3. **Génération** : `temoin generate <preset> --json`.
+3. **Génération** : `indicator generate <preset> --json`.
 4. **Résumé** à l'utilisateur, par exemple :
 
    ```text

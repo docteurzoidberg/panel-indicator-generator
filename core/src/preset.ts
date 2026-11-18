@@ -2,7 +2,7 @@
 // docs/generateur.md). Dimensions in mm. v1 only sets what has been validated in print
 // (decision of 30/10/2026); everything else is fixed in the core. Only the text and the
 // panel thickness are required; every other key defaults to the value of the example
-// presets/alarme.json, with black colours. An unknown key is rejected (typo). Compatible
+// presets/alarme.json, with black colors. An unknown key is rejected (typo). Compatible
 // additions stay in v1; any change of a key or of a default value moves to v2, with its
 // migration. Messages and descriptions are shown to the user: they stay in French.
 import * as z from 'zod';
@@ -86,7 +86,7 @@ export function parsePreset(data: unknown): ParseResult {
   return { ok: false, errors: r.error.issues.map((i) => `${where(i.path)} : ${i.message}`) };
 }
 
-// The preset file as the generator writes it (<name>.json of temoin generate, Save button
+// The preset file as the generator writes it (<name>.json of indicator generate, Save button
 // of the page): default values included, without $schema.
 export function presetJson(preset: Preset): string {
   const { $schema, ...used } = preset;

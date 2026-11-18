@@ -1,8 +1,8 @@
 // Page link: the preset makes the round trip, and what is not a valid preset comes back as
-// is, to give the same errors as temoin check.
+// is, to give the same errors as indicator check.
 import { readFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
-import { presetJsonSchema } from '@temoin/core';
+import { presetJsonSchema } from '@indicator/core';
 import { rows, type SchemaNode } from '../src/fields.ts';
 import { fromHash, toHash } from '../src/link.ts';
 

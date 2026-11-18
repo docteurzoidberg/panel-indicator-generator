@@ -1,5 +1,5 @@
 // OpenCascade (WASM) start-up under Node, for the command line and the tests; the page
-// does it on its own (the .wasm is a separately served file there, LGPL licence).
+// does it on its own (the .wasm is a separately served file there, LGPL license).
 import { createRequire } from 'node:module';
 import opencascade from 'replicad-opencascadejs';
 import { setOC } from 'replicad';

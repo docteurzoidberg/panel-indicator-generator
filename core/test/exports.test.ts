@@ -49,7 +49,7 @@ describe('STL: oriented and placed like the mock-up', () => {
   });
 });
 
-test('legend 3MF: one object of 2 parts, preset colours', () => {
+test('legend 3MF: one object of 2 parts, preset colors', () => {
   const z = unzipSync(files['alarme_legende.3mf']);
   expect(Object.keys(z).sort()).toEqual(['3D/3dmodel.model', '[Content_Types].xml', '_rels/.rels']);
   const model = strFromU8(z['3D/3dmodel.model']);
@@ -59,18 +59,18 @@ test('legend 3MF: one object of 2 parts, preset colours', () => {
   expect(model).toContain('name="lettres et voile" displaycolor="#F4F4F0FF"');
 });
 
-test('frame 3MF: its colour', () => {
+test('frame 3MF: its color', () => {
   expect(strFromU8(unzipSync(files['alarme_cadre.3mf'])['3D/3dmodel.model'])).toContain('displaycolor="#4B5320FF"');
 });
 
-test('STEP: 5 parts read back, exact volumes, frame colour kept', async () => {
+test('STEP: 5 parts read back, exact volumes, frame color kept', async () => {
   const text = strFromU8(files['alarme.step']);
   expect(text).toContain("FILE_NAME('alarme','1980-01-01T00:00:00'");
   for (const n of ['cadre', 'masque', 'voile', 'boite', 'fond']) expect(text).toContain(`'${n}'`);
-  // #4b5320 = (0.294, 0.325, 0.125) in sRGB: found again within quantisation (8-bit
+  // #4b5320 = (0.294, 0.325, 0.125) in sRGB: found again within quantization (8-bit
   // linear conversion).
-  const colours = [...text.matchAll(/COLOUR_RGB\('',([^,]+),([^,]+),\s*([^)]+)\)/g)].map((m) => m.slice(1, 4).map(Number));
-  expect(colours.some((c) => [75, 83, 32].every((v, i) => Math.abs(c[i] - v / 255) < 0.01))).toBe(true);
+  const colors = [...text.matchAll(/COLOUR_RGB\('',([^,]+),([^,]+),\s*([^)]+)\)/g)].map((m) => m.slice(1, 4).map(Number));
+  expect(colors.some((c) => [75, 83, 32].every((v, i) => Math.abs(c[i] - v / 255) < 0.01))).toBe(true);
   const back = await importSTEP(new Blob([new Uint8Array(files['alarme.step'])])) as Shape3D;
   const expected = [parts.frame, parts.mask, parts.veil, parts.box, parts.cover].reduce((s, p) => s + measureVolume(p), 0);
   expect(measureVolume(back)).toBeCloseTo(expected, 3);
@@ -82,7 +82,7 @@ test('identical from one generation to the next', async () => {
 });
 
 // The page rebuilds the parts on every input: the STEP must not depend on the state of
-// OpenCascade's memory (the colour presentation is sorted by address there).
+// OpenCascade's memory (the color presentation is sorted by address there).
 test('identical with parts rebuilt after other computations', async () => {
   const build = (text: string) => {
     const d = dimensions({ ...preset, legend: { ...preset.legend, text } });

@@ -5,11 +5,11 @@ n'importe quel projet : une légende qui s'allume derrière une fenêtre, dans
 un cadre qui se monte dans la découpe d'un panneau, comme un voyant ou un
 annonciateur de tableau de bord.
 
-**Page en ligne : <https://docteurzoidberg.github.io/generateur-temoin-lumineux/>**
+**Page en ligne : <https://docteurzoidberg.github.io/panel-indicator-generator/>**
 (tout se calcule dans le navigateur, sans serveur ; marche hors ligne une
 fois chargée).
 
-> **État (31/10/2026) : v1 utilisable.** La page, la commande `temoin` et
+> **État (31/10/2026) : v1 utilisable.** La page, la commande `indicator` et
 > le skill Claude Code produisent les mêmes fichiers depuis un preset. Les
 > pièces sont celles d'impressions d'essai validées, en vis M3 ; la v1 ne
 > règle que ce qui a été éprouvé. Feuille de route : [PLAN.md](PLAN.md).
@@ -60,7 +60,7 @@ d'essai, imprimable, permet de monter le témoin avant de percer le vrai.
 - **Presets** : ouvrir un fichier (ou le glisser sur la page), l'enregistrer,
   partir d'un exemple ; le lien de la page porte le preset.
 - **Télécharger** le zip des fichiers d'impression, les mêmes que ceux de
-  `temoin generate`.
+  `indicator generate`.
 
 ## Le preset
 
@@ -102,8 +102,8 @@ identiques d'une génération à l'autre.
 Node 22.18 ou plus.
 
 ```bash
-git clone https://github.com/docteurzoidberg/generateur-temoin-lumineux.git
-cd generateur-temoin-lumineux
+git clone https://github.com/docteurzoidberg/panel-indicator-generator.git
+cd panel-indicator-generator
 npm install
 npm run web          # la page, servie par Vite (http://localhost:5173)
 ```
@@ -112,7 +112,7 @@ npm run web          # la page, servie par Vite (http://localhost:5173)
 npm run typecheck
 npx playwright-core install --only-shell chromium   # Chromium headless des tests de la page
 npm test
-npm run build -w @temoin/web                        # page construite dans web/dist
+npm run build -w @indicator/web                        # page construite dans web/dist
 ```
 
 `npm install` active aussi un hook git (`.githooks/pre-push`) : avant chaque
@@ -122,9 +122,9 @@ push, il lance le typecheck et tous les tests, et bloque le push s'ils
 ### Ligne de commande
 
 ```bash
-(cd cli && npm link)                       # installe la commande temoin
-temoin check presets/alarme.json           # contrôles seuls, rien n'est écrit
-temoin generate presets/alarme.json        # fichiers dans presets/export/
+(cd cli && npm link)                       # installe la commande indicator
+indicator check presets/alarme.json           # contrôles seuls, rien n'est écrit
+indicator generate presets/alarme.json        # fichiers dans presets/export/
 ```
 
 ```text
@@ -142,12 +142,12 @@ preset est bon (avertissements possibles), 1 s'il est refusé.
 
 ### Skill Claude Code
 
-Le skill `temoin-lumineux` fait la même chose depuis n'importe quel projet,
+Le skill `panel-indicator` fait la même chose depuis n'importe quel projet,
 qui garde son preset dans `design/temoin/<nom>.json` : « génère le témoin »,
 « vérifie le témoin », « fais un témoin ARMÉ, panneau de 3 mm ».
 
 ```bash
-ln -s "$PWD/skill" ~/.claude/skills/temoin-lumineux   # depuis le dépôt cloné, après npm link
+ln -s "$PWD/skill" ~/.claude/skills/panel-indicator   # depuis le dépôt cloné, après npm link
 ```
 
 Mode d'emploi : [docs/skill.md](docs/skill.md).
@@ -178,8 +178,8 @@ de l'éclairage. Détail : [PLAN.md](PLAN.md) et
 PLAN.md     feuille de route, décisions, vocabulaire
 docs/       plan et spécification du générateur, mode d'emploi du skill
 core/       noyau (TypeScript) : preset, légende, pièces, contrôles, exports
-cli/        ligne de commande temoin (check, generate)
-skill/      skill Claude Code temoin-lumineux
+cli/        ligne de commande indicator (check, generate)
+skill/      skill Claude Code panel-indicator
 web/        page web (Vite) : le noyau dans des Web Workers, sans serveur
 presets/    presets d'exemple et JSON Schema du preset
 fonts/      polices libres fournies (OFL)
@@ -196,7 +196,7 @@ Want To Public License, version 2 (<https://www.wtfpl.net/>).
 
 Elle ne s'applique pas à ce qui vient d'ailleurs : ses dépendances, libres,
 et ses polices gardent leur licence, que la page cite dans son pied de
-page et dans `licences.txt`, avec le texte de chacune. Elles autorisent
+page et dans `licenses.txt`, avec le texte de chacune. Elles autorisent
 cette licence pour notre code : OpenCascade (LGPL) reste un fichier à part,
 remplaçable, avec ses sources citées ; les polices restent sous OFL, avec
 leur texte (`fonts/OFL-Barlow.txt`).

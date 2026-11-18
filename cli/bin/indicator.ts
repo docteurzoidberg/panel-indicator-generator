@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 // Command line of the indicator light generator (docs/generateur.md):
-//   temoin check <preset.json> [--json]
-//   temoin generate <preset.json> [-o <dir>] [--json]
+//   indicator check <preset.json> [--json]
+//   indicator generate <preset.json> [-o <dir>] [--json]
 // <dir>: export/ next to the preset by default; preset <name> = name of the files.
 // Exit code: 0 valid, 1 preset error, 2 bad usage. Output is for the user: it stays in
 // French.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { checkPreset, generate, LEGEND, parseFont, summaryLines, type CheckResult } from '@temoin/core';
-import { initOC } from '@temoin/core/occ-node';
+import { checkPreset, generate, LEGEND, parseFont, summaryLines, type CheckResult } from '@indicator/core';
+import { initOC } from '@indicator/core/occ-node';
 
-const USAGE = `usage : temoin check <preset.json> [--json]
-        temoin generate <preset.json> [-o <dossier>] [--json]`;
+const USAGE = `usage : indicator check <preset.json> [--json]
+        indicator generate <preset.json> [-o <dossier>] [--json]`;
 
 function fail(message: string, code = 2): never {
   console.error(message);

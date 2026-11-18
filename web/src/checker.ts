@@ -1,7 +1,7 @@
 // Checks worker: the core without OpenCascade (preset, legend, checks, summary), in a few
 // tens of milliseconds, enough to keep up with typing; also returns the drawing of the
 // front view.
-import { checkPreset, parseFont, presetJson, summaryLines } from '@temoin/core';
+import { checkPreset, parseFont, presetJson, summaryLines } from '@indicator/core';
 import fontUrl from '../../fonts/BarlowCondensed-SemiBold.ttf?url';   // LEGEND.fontFile
 import { faceModel } from './face-model.ts';
 import type { FromChecker, ToChecker } from './protocol.ts';

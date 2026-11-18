@@ -1,5 +1,5 @@
 /* Generator page: settings and mounting on the left, preview, checks and download on the
-   right (stacked on phones). Colours and typography from the mock-up's eclate.html. */
+   right (stacked on phones). Colors and typography from the mock-up's eclate.html. */
 @font-face {
   font-family: "Barlow Condensed";
   font-weight: 600;
@@ -168,7 +168,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .primary { background: var(--olive); color: var(--surface); border: 1px solid var(--olive); border-radius: 4px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
 .primary:disabled { opacity: .45; cursor: not-allowed; }
 .status { margin: 0; font-size: 12.5px; color: var(--muted); }
-/* Footer: signature, offline use, licences, side by side (stacked on narrow screens). */
+/* Footer: signature, offline use, licenses, side by side (stacked on narrow screens). */
 .credits { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 16px 32px; border-top: 1px solid var(--line); padding: 16px 0 8px; font-size: 12.5px; color: var(--muted); }
 @media (max-width: 880px) { .credits { grid-template-columns: minmax(0, 1fr); } }
 .credits h2 { font-family: var(--font-mono); font-size: 10.5px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }

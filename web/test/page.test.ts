@@ -1,5 +1,5 @@
-// The page, built by Vite and opened in headless Chromium, against the temoin command: for
-// the same preset, same checks (temoin check) and same files (temoin generate), whether it
+// The page, built by Vite and opened in headless Chromium, against the indicator command: for
+// the same preset, same checks (indicator check) and same files (indicator generate), whether it
 // is typed in, opened, dropped or reopened from its link. One page for all cases: each
 // settings case then restores the alarme settings. Expected texts are the page's, in
 // French.
@@ -11,12 +11,12 @@ import { basename, join } from 'node:path';
 import { promisify } from 'node:util';
 import { unzipSync } from 'fflate';
 import { chromium, type Browser, type Page } from 'playwright-core';
-import { parsePreset, presetJson } from '@temoin/core';
+import { parsePreset, presetJson } from '@indicator/core';
 import { build, preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
 
 const WEB = new URL('..', import.meta.url).pathname;
-const BIN = new URL('../../cli/bin/temoin.ts', import.meta.url).pathname;
+const BIN = new URL('../../cli/bin/indicator.ts', import.meta.url).pathname;
 const ALARM = new URL('../../presets/alarme.json', import.meta.url).pathname;
 const alarm = JSON.parse(readFileSync(ALARM, 'utf8'));
 const MARK = { ok: '✓', warn: '⚠', error: '✗' } as const;
@@ -42,7 +42,7 @@ let out: string, server: PreviewServer, browser: Browser, page: Page;
 const errors: string[] = [];
 
 beforeAll(async () => {
-  out = mkdtempSync(join(tmpdir(), 'temoin-web-'));
+  out = mkdtempSync(join(tmpdir(), 'indicator-web-'));
   const config = { root: WEB, logLevel: 'error' as const, build: { outDir: join(out, 'dist') } };
   await build(config);
   server = await preview({ ...config, preview: { port: 0 } });
@@ -68,7 +68,7 @@ function presetFile(name: string, preset: object): string {
   return f;
 }
 
-// Lines of temoin check for a preset (object, or file).
+// Lines of indicator check for a preset (object, or file).
 function cliLines(preset: object | string): string[] {
   const f = typeof preset === 'string' ? preset : presetFile('sample.json', preset);
   return JSON.parse(runCli('check', f, '--json').stdout).checks.map((c: { level: keyof typeof MARK; message: string }) => `${MARK[c.level]} ${c.message}`);
@@ -98,7 +98,7 @@ async function dropFile(path: string): Promise<void> {
   await expect.poll(presetStatus).toBe(`Ouvert : ${basename(path)}`);
 }
 
-test('alarme: 3D view first, the six printed pieces of the core; checks of temoin check, mounting, front view', async () => {
+test('alarme: 3D view first, the six printed pieces of the core; checks of indicator check, mounting, front view', async () => {
   expect(await page.getByRole('button', { name: '3D', exact: true }).getAttribute('aria-pressed')).toBe('true');
   await expect.poll(() => page.locator('#stage3d').getAttribute('data-built'), { timeout: 60000 }).toBe('frame mask+veil box cover testPanel');
   expect(await page.locator('#stage3d canvas').count()).toBe(1);
@@ -112,7 +112,7 @@ test('alarme: 3D view first, the six printed pieces of the core; checks of temoi
   expect(await page.locator('#face .screw').count()).toBe(2);
 }, 90000);
 
-test('light: letters in the light colour with their halo, white veil when off', async () => {
+test('light: letters in the light color with their halo, white veil when off', async () => {
   const look = () => page.locator('#face').evaluate((svg) => {
     const ink = svg.querySelector<SVGElement>('.ink')!, halo = svg.querySelector<SVGElement>('.halo')!;
     return { ink: ink.style.fill, halo: halo.style.fill, opacity: Number(halo.style.opacity) };
@@ -125,11 +125,11 @@ test('light: letters in the light colour with their halo, white veil when off', 
   expect([amber.ink, amber.halo]).toEqual(['rgb(255, 204, 89)', 'rgb(255, 176, 0)']);   // a little whiter at the core
   expect(amber.opacity).toBeGreaterThan(0.8);
   await page.getByRole('button', { name: 'Blanc' }).click();
-  expect((await look()).opacity).toBeLessThan(amber.opacity);   // bright colour: halo held back
+  expect((await look()).opacity).toBeLessThan(amber.opacity);   // bright color: halo held back
 
   await page.getByRole('button', { name: 'Éteinte' }).click();
   expect(await look()).toEqual({ ink: 'rgb(207, 205, 196)', halo: 'rgb(255, 255, 255)', opacity: 0 });
-  await page.getByRole('button', { name: 'Vert' }).click();   // a colour lights it again
+  await page.getByRole('button', { name: 'Vert' }).click();   // a color lights it again
   expect(await pressed('#light-state')).toEqual(['Fixe']);
   expect((await look()).halo).toBe('rgb(0, 224, 64)');
   await page.getByRole('button', { name: 'Blanc' }).click();
@@ -140,7 +140,7 @@ test.each([
   ['window too wide', 'Largeur de la fenêtre', '45', '27', (p: any) => { p.window.width = 45; }],
   ['no screw fits', 'Panneau', '30', '3', (p: any) => { p.panel.thickness = 30; }],
   ['panel without thickness', 'Panneau', '', '3', (p: any) => { delete p.panel.thickness; }],
-])('%s: checks of temoin check, download blocked', async (_, label, value, original, change) => {
+])('%s: checks of indicator check, download blocked', async (_, label, value, original, change) => {
   const field = page.getByLabel(label, { exact: true });
   await field.fill(value);
   const preset = structuredClone(alarm);
@@ -163,7 +163,7 @@ test('number fields: the whole value in sight, up to 6 characters', async () => 
   await expect.poll(pageLines, { timeout: 10000 }).toEqual(cliLines(alarm));
 }, 30000);
 
-test('alarme: the page zip holds the files of temoin generate', async () => {
+test('alarme: the page zip holds the files of indicator generate', async () => {
   const cli = join(out, 'cli');
   const generated = promisify(execFile)(process.execPath, [BIN, 'generate', ALARM, '-o', cli]);   // at the same time as the page
   const button = page.getByRole('button', { name: 'Télécharger le zip' });
@@ -177,13 +177,13 @@ test('alarme: the page zip holds the files of temoin generate', async () => {
   expect(Object.keys(expected)).toHaveLength(12);
   expect(Object.fromEntries(Object.entries(zip).map(([f, b]) => [f, sha(b)]))).toEqual(expected);
 
-  // Save: the preset as temoin generate writes it.
+  // Save: the preset as indicator generate writes it.
   const [saved] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Enregistrer' }).click()]);
   expect(saved.suggestedFilename()).toBe('alarme.json');
   expect(sha(readFileSync(await saved.path()))).toBe(expected['alarme.json']);
 }, 120000);
 
-test('opened preset: checks of temoin check, file name, saved as is', async () => {
+test('opened preset: checks of indicator check, file name, saved as is', async () => {
   const file = presetFile('pump.json', PUMP);
   await openFile(file);
   await expect.poll(pageLines, { timeout: 10000 }).toEqual(cliLines(file));
@@ -214,7 +214,7 @@ test('link: copied, it reopens the same preset in another page', async () => {
   await other.close();
 }, 30000);
 
-test('invalid preset, dropped: "path : message" errors of temoin check, kept on input', async () => {
+test('invalid preset, dropped: "path : message" errors of indicator check, kept on input', async () => {
   const file = presetFile('invalid.json', INVALID);
   await dropFile(file);
   const lines = cliLines(file);
@@ -231,7 +231,7 @@ test('invalid preset, dropped: "path : message" errors of temoin check, kept on 
   await expect.poll(pageLines, { timeout: 10000 }).toEqual(cliLines({ ...kept, legend: { ...INVALID.legend, text: 'Y' } }));
 }, 30000);
 
-test('alarme example: checks of temoin check, name derived from the text', async () => {
+test('alarme example: checks of indicator check, name derived from the text', async () => {
   await page.locator('#examples summary').click();
   await page.getByRole('button', { name: 'alarme', exact: true }).click();
   expect(await page.locator('#examples').getAttribute('open')).toBeNull();
@@ -269,7 +269,7 @@ test('theme: the button switches between light and dark, kept in the browser', a
   }
 });
 
-test('offline: once loaded, the page works without network, licences included', async () => {
+test('offline: once loaded, the page works without network, licenses included', async () => {
   const context = await browser.newContext();
   context.on('weberror', (e) => errors.push(e.error().message));
   const offline = await context.newPage();
@@ -291,8 +291,8 @@ test('offline: once loaded, the page works without network, licences included', 
   const [download] = await Promise.all([offline.waitForEvent('download', { timeout: 60000 }), button.click()]);
   expect(Object.keys(unzipSync(readFileSync(await download.path())))).toHaveLength(12);
 
-  expect(await offline.locator('footer a[href="licences.txt"]').count()).toBe(1);
-  const licences = await offline.evaluate(() => fetch('licences.txt').then((r) => r.text()));
-  for (const line of ['replicad-opencascadejs 1.2.1 : LGPL-2.1-only', '@fontsource/b612 5.3.0 : OFL-1.1', 'Police Barlow Condensed (fonts/BarlowCondensed-SemiBold.ttf) : OFL-1.1']) expect(licences).toContain(line);
+  expect(await offline.locator('footer a[href="licenses.txt"]').count()).toBe(1);
+  const licenses = await offline.evaluate(() => fetch('licenses.txt').then((r) => r.text()));
+  for (const line of ['replicad-opencascadejs 1.2.1 : LGPL-2.1-only', '@fontsource/b612 5.3.0 : OFL-1.1', 'Police Barlow Condensed (fonts/BarlowCondensed-SemiBold.ttf) : OFL-1.1']) expect(licenses).toContain(line);
   await context.close();
 }, 180000);

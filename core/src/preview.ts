@@ -49,7 +49,7 @@ function meshOf(shapes: Shape3D[]): PartMesh {
 }
 
 // Builders by group of pieces, with the preset settings their shape depends on (through
-// dims.ts); colours change no shape.
+// dims.ts); colors change no shape.
 const size = (p: Preset) => [p.frame.width, p.frame.height];
 const GROUPS: { parts: string[]; key: (p: Preset) => unknown[]; build: (d: Dimensions, layout: LegendLayout) => Shape3D[][] }[] = [
   { parts: ['frame'], key: (p) => [p.window, size(p), p.mount], build: (d) => [[frame(d)]] },

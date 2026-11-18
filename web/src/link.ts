@@ -2,7 +2,7 @@
 // parameter per key, at its path in the preset ("frame.width=47"), plus the name of the
 // files ("name=claude"). Read back, each value takes the type of its field: a number or a
 // text, and what is not a number stays a text, so that its errors are those of
-// temoin check.
+// indicator check.
 import type { Row } from './fields.ts';
 
 export interface Linked { preset: Record<string, unknown>; name: string }

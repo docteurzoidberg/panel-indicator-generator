@@ -28,7 +28,7 @@ Les étapes se lancent une à une, à la demande de l'utilisateur.
 3. **Noyau et ligne de commande** *(fait le 30/10/2026, branche
    `etape-3-noyau`)* : pièces, contrôles et exports (3MF, STL,
    STEP, gabarit, nomenclature) construits depuis le preset, commande
-   `temoin` ; d'abord un prototype du moteur géométrique, puis la parité
+   `indicator` ; d'abord un prototype du moteur géométrique, puis la parité
    avec la maquette Fusion.
 4. **Skill Claude Code global** *(fait le 30/10/2026, branche `etape-4-skill`)* (lien
    depuis `~/.claude/skills`, source dans `skill/`) : demander un témoin depuis un projet hôte, le générer depuis
@@ -37,8 +37,8 @@ Les étapes se lancent une à une, à la demande de l'utilisateur.
 5. **Page web** *(fait le 31/10/2026, branche `etape-5-web`)* : réglages ou preset ouvert (celui d'un projet hôte, par
    exemple), aperçu en temps réel (éclaté ou assemblé, éteint
    ou allumé) et téléchargements, dans le navigateur, sans serveur.
-6. **Anglais par défaut, nouveau dépôt** *(décidée le 18/11/2026, pas
-   lancée)* : le projet passe dans un nouveau dépôt
+6. **Anglais par défaut, nouveau dépôt** *(décidée le 18/11/2026 ; lots 6.1 et 6.2
+   faits le 18/11/2026)* : le projet passe dans un nouveau dépôt
    `panel-indicator-generator`, en anglais américain, qui devient la
    référence ; ce dépôt-ci, en français, est gardé un temps puis gelé. En
    français restent une version des docs et la page, multilingue. Lots :

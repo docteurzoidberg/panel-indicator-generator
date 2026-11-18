@@ -1,6 +1,6 @@
 // 3D viewer of the preview meshes, after the mock-up's eclate.html: pieces exploded or
 // assembled along the depth, any piece hidden on demand, and the simulated light
-// (light.ts): the veil glows in the light colour, with a halo around it. Meshes come in
+// (light.ts): the veil glows in the light color, with a halo around it. Meshes come in
 // the indicator frame (x right, y towards the wall, z up); three.js has y up and z towards
 // the viewer, hence the rotation of the root group. Loaded on demand (dynamic import).
 import {
@@ -14,7 +14,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import type { PreviewPart } from '@temoin/core';
+import type { PreviewPart } from '@indicator/core';
 import { haloShare, intensity, mix, type Light } from './light.ts';
 
 // Offset of each piece along the depth when exploded (mm, towards the wall), as in
@@ -25,7 +25,7 @@ const LIT_PART = 'legende_voile';
 // Halo of the lit veil: the blur of a bloom of the veil alone (selective bloom, as in
 // three.js' webgl_postprocessing_unreal_bloom_selective example), drawn with the other
 // pieces in black so that they still hide it, then added to the scene. No brightness
-// threshold: all the letters and all the colours glow alike, whatever the scene lights.
+// threshold: all the letters and all the colors glow alike, whatever the scene lights.
 const HALO = { strength: 0.6, radius: 0.4 };
 const MIX = {
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -98,9 +98,9 @@ export function createViewer(container: HTMLElement) {
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readTheme);
   new MutationObserver(readTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-  // Lit veil as in the front view (face.ts): letters in the light colour, a little whiter
+  // Lit veil as in the front view (face.ts): letters in the light color, a little whiter
   // at the core, with the white of the veil, lit by the scene, fading under them; halo in
-  // the light colour. Never above 1 per channel, which would turn them white.
+  // the light color. Never above 1 per channel, which would turn them white.
   function render(t: number): void {
     const veil = pieces.get(LIT_PART), k = intensity(light, t);
     if (veil) {
@@ -165,7 +165,7 @@ export function createViewer(container: HTMLElement) {
   }
 
   return {
-    // New meshes: geometries replaced in place, materials kept (colour updated).
+    // New meshes: geometries replaced in place, materials kept (color updated).
     show(parts: PreviewPart[]): void {
       for (const part of parts) {
         let p = pieces.get(part.name);

@@ -49,7 +49,7 @@ describe('ALARME, like the mock-up', () => {
     expect(lay.room).toBeCloseTo(LEGEND.margin, 6);
   });
 
-  test('ink polygons and islands: areas and centres', () => {
+  test('ink polygons and islands: areas and centers', () => {
     expect(lay.ink).toHaveLength(mockup.ink.length);
     expect(lay.islands).toHaveLength(mockup.islands.length);
     const ours = lay.ink.map((p) => ({ area: area(p), c: centroid([p.outer, ...p.holes]) }));

@@ -1,7 +1,7 @@
 // Front view: what to draw, computed in the checks worker from the core's dimensions and
-// legend; the page (face.ts) only has to draw it. Dimensions in mm, origin at the centre of
+// legend; the page (face.ts) only has to draw it. Dimensions in mm, origin at the center of
 // the window, y down (SVG).
-import { M3, type Dimensions, type LegendLayout, type Preset, type Ring } from '@temoin/core';
+import { M3, type Dimensions, type LegendLayout, type Preset, type Ring } from '@indicator/core';
 
 export interface FaceModel {
   frame: { w: number; h: number; r: number; color: string };

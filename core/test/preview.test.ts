@@ -38,7 +38,7 @@ describe('alarme', () => {
   let result: ReturnType<typeof preview>;
   beforeAll(() => { result = preview(preset()); }, 60000);
 
-  test('the printed pieces, in assembly order, with their label and colour', () => {
+  test('the printed pieces, in assembly order, with their label and color', () => {
     expect(result.parts.map((p) => p.name)).toEqual(['cadre', 'legende_masque', 'legende_voile', 'boite', 'fond', 'panneau_essai']);
     expect(result.parts[0]).toMatchObject({ label: 'cadre', color: '#4b5320' });
     expect(result.built).toEqual(['frame', 'mask+veil', 'box', 'cover', 'testPanel']);
@@ -69,13 +69,13 @@ describe('alarme', () => {
   }, 60000);
 });
 
-test('cache: a new text rebuilds the legend only, a colour nothing, a frame size what it holds', () => {
+test('cache: a new text rebuilds the legend only, a color nothing, a frame size what it holds', () => {
   const cache: PreviewCache = new Map();
   preview(preset(), cache);
   expect(preview(preset((p) => { p.legend.text = 'CLAUDE'; }), cache).built).toEqual(['mask+veil']);
-  const recoloured = preview(preset((p) => { p.legend.text = 'CLAUDE'; p.frame.color = '#5c623c'; }), cache);
-  expect(recoloured.built).toEqual([]);
-  expect(recoloured.parts[0].color).toBe('#5c623c');
+  const recolored = preview(preset((p) => { p.legend.text = 'CLAUDE'; p.frame.color = '#5c623c'; }), cache);
+  expect(recolored.built).toEqual([]);
+  expect(recolored.parts[0].color).toBe('#5c623c');
   expect(preview(preset((p) => { p.legend.text = 'CLAUDE'; p.frame.width = 50; }), cache).built).toEqual(['frame', 'box', 'testPanel']);
   expect(preview(preset((p) => { p.legend.text = 'CLAUDE'; p.frame.width = 50; p.light.wireExit = 'right'; }), cache).built).toEqual(['box', 'cover']);
 }, 60000);

@@ -4,8 +4,8 @@
 //   face on the bed: frame, legend, test panel; back: box, cover); the parts of a group
 //   (mask and veil) keep a common frame of reference;
 // - <name>_<print>.3mf: generic 3MF like the mock-up's export_3mf.py, one part per
-//   colour, without any slicer setting;
-// - <name>.step: named and coloured assembly, in the indicator frame, for integration;
+//   color, without any slicer setting;
+// - <name>.step: named and colored assembly, in the indicator frame, for integration;
 // - <name>.json: the preset used, default values included.
 // Part names and labels end up in file names and slicers: they stay in French.
 import { strToU8, zipSync } from 'fflate';
@@ -23,7 +23,7 @@ export interface PieceInfo { name: string; label: string; part: keyof Parts; sid
 interface Piece extends PieceInfo { shape: Shape3D }
 
 // The printed pieces, in assembly order from front to back, with their file name, label
-// and colour; the preview shows the same ones.
+// and color; the preview shows the same ones.
 export function pieceInfo(p: Preset): PieceInfo[] {
   return [
     { name: 'cadre', label: 'cadre', part: 'frame', side: 'face', group: 'cadre', color: p.frame.color },
@@ -37,14 +37,14 @@ export function pieceInfo(p: Preset): PieceInfo[] {
 
 const pieces = (p: Preset, parts: Parts): Piece[] => pieceInfo(p).map((info) => ({ ...info, shape: parts[info.part] }));
 
-// 3MF prints: objects, each made of one or more parts (one per colour).
+// 3MF prints: objects, each made of one or more parts (one per color).
 const JOBS: Record<string, [string, string[]][]> = {
   legende: [['legende', ['legende_masque', 'legende_voile']]],
   boite_fond: [['boite', ['boite']], ['fond', ['fond']]],
   cadre: [['cadre', ['cadre']]],
   panneau_essai: [['panneau_essai', ['panneau_essai']]],
 };
-const PLATE_CENTER = [100, 100];   // assumed bed centre (mm), to rearrange when slicing
+const PLATE_CENTER = [100, 100];   // assumed bed center (mm), to rearrange when slicing
 const GAP = 5;                     // gap between the objects of a print (mm)
 
 // 90° rotation about X: the wanted face goes down (minimal z).
@@ -85,7 +85,7 @@ function checkMesh(name: string, tris: Tri[]): void {
 
 function stlBytes(tris: Tri[]): Uint8Array {
   const out = new Uint8Array(84 + 50 * tris.length);
-  out.set(strToU8('generateur-temoin-lumineux'.padEnd(80, ' ')));
+  out.set(strToU8('panel-indicator-generator'.padEnd(80, ' ')));
   const dv = new DataView(out.buffer);
   dv.setUint32(80, tris.length, true);
   tris.forEach((t, i) => t.forEach((v, k) => dv.setFloat32(84 + 50 * i + 12 + 4 * k, v, true)));
@@ -134,14 +134,14 @@ function threeMf(title: string, objects: [string, { label: string; color: string
       res.push(meshXml(id, parts.length > 1 ? p.label : name, mats.indexOf(mat), p.tris));
       return id++;
     });
-    if (ids.length > 1) {   // multi-filament object: one part per colour, same frame
+    if (ids.length > 1) {   // multi-filament object: one part per color, same frame
       res.push(`  <object id="${id}" type="model" name="${esc(name)}">\n   <components>\n`
         + ids.map((i) => `    <component objectid="${i}"/>`).join('\n') + '\n   </components>\n  </object>');
       ids.splice(0, ids.length, id++);
     }
     layout.push([ids[0], ...bounds(parts.flatMap((p) => p.tris))]);
   }
-  // Objects in a row along X, the whole centred on the bed.
+  // Objects in a row along X, the whole centered on the bed.
   const width = layout.reduce((w, [, lo, hi]) => w + hi[0] - lo[0], 0) + GAP * (layout.length - 1);
   let x = PLATE_CENTER[0] - width / 2;
   const items = layout.map(([i, lo, hi]) => {
@@ -151,14 +151,14 @@ function threeMf(title: string, objects: [string, { label: string; color: string
   });
   const bases = mats.map((m) => { const [label, color] = m.split('|'); return `   <base name="${esc(label)}" displaycolor="${color.toUpperCase()}FF"/>`; });
   const model = `<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="fr-FR" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">\n`
-    + ` <metadata name="Title">${esc(title)}</metadata>\n <metadata name="Application">generateur-temoin-lumineux</metadata>\n`
+    + ` <metadata name="Title">${esc(title)}</metadata>\n <metadata name="Application">panel-indicator-generator</metadata>\n`
     + ` <resources>\n  <basematerials id="1">\n${bases.join('\n')}\n  </basematerials>\n${res.join('\n')}\n </resources>\n`
     + ` <build>\n${items.join('\n')}\n </build>\n</model>\n`;
   const entry = (s: string) => [strToU8(s), { mtime: ZIP_DATE }] as [Uint8Array, { mtime: Date }];
   return zipSync({ '[Content_Types].xml': entry(CONTENT_TYPES), '_rels/.rels': entry(RELS), '3D/3dmodel.model': entry(model) }, { level: 6 });
 }
 
-// OpenCascade reads colours as linear RGB and writes sRGB in the STEP: without a
+// OpenCascade reads colors as linear RGB and writes sRGB in the STEP: without a
 // conversion, Fusion shows them too light.
 function linear(hex: string): string {
   return '#' + [1, 3, 5].map((i) => {
@@ -168,10 +168,10 @@ function linear(hex: string): string {
   }).join('');
 }
 
-// OpenCascade writes the presentation (colours) last, one block per part, in the order of
+// OpenCascade writes the presentation (colors) last, one block per part, in the order of
 // a table sorted by memory address: the order changes as soon as parts are rebuilt (page
 // previews, another JavaScript engine). It is rewritten in a fixed order: blocks sorted by
-// what they colour, entities renumbered in reading order.
+// what they color, entities renumbered in reading order.
 function stableStyles(text: string): string {
   const start = text.search(/^#\d+ = MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION\(/m);
   if (start < 0) return text;
@@ -204,7 +204,7 @@ async function step(name: string, list: Piece[]): Promise<Uint8Array> {
 export async function exportFiles(name: string, preset: Preset, parts: Parts): Promise<Record<string, Uint8Array>> {
   const list = pieces(preset, parts);
   const tris = new Map(list.map((p) => [p.name, oriented(p.shape, p.side)]));
-  // Common translation for each group: centred in XY, resting at z = 0.
+  // Common translation for each group: centered in XY, resting at z = 0.
   const groups = new Map<string, [number[], number[]]>();
   for (const p of list) {
     const [lo, hi] = bounds(tris.get(p.name)!);

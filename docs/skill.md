@@ -1,10 +1,10 @@
-# Skill `temoin-lumineux` : mode d'emploi
+# Skill `panel-indicator` : mode d'emploi
 
 Mise à jour : 30/10/2026. **Écrit le 30/10/2026** :
 [`skill/SKILL.md`](../skill/SKILL.md) (étape 4 du [PLAN](../PLAN.md) ; plan :
 [plan-generateur.md](plan-generateur.md)). Ce document dit comment on s'en
 sert depuis un autre projet et ce qu'il rend. Pour les humains, les projets hôtes et leurs agents. Outil qu'il
-appelle, la commande `temoin` : [generateur.md](generateur.md).
+appelle, la commande `indicator` : [generateur.md](generateur.md).
 
 Depuis un projet hôte, on demande un témoin lumineux personnalisé ; le skill
 le décrit dans un preset du projet, le vérifie, produit les fichiers
@@ -15,13 +15,13 @@ du projet.
 
 Skill **global** (décision du 30/10/2026) : disponible dans tous les
 projets, sans option au lancement de Claude Code. La source reste dans ce
-dépôt (`skill/`, avec `SKILL.md`) ; `~/.claude/skills/temoin-lumineux` est un
+dépôt (`skill/`, avec `SKILL.md`) ; `~/.claude/skills/panel-indicator` est un
 lien vers elle, posé une fois depuis le dépôt cloné, avec la commande :
 
 ```bash
-cd generateur-temoin-lumineux   # le dépôt cloné
-ln -s "$PWD/skill" ~/.claude/skills/temoin-lumineux
-(cd cli && npm link)            # la commande temoin
+cd panel-indicator-generator   # le dépôt cloné
+ln -s "$PWD/skill" ~/.claude/skills/panel-indicator
+(cd cli && npm link)            # la commande indicator
 ```
 
 Le lien suit le dépôt : une mise à jour du skill vaut aussitôt partout.
@@ -64,11 +64,11 @@ Un preset par témoin ; `<nom>` préfixe tous les fichiers produits.
    couleurs du cadre et du fond de la légende le sont aussi, avec leur
    valeur par défaut proposée. Les valeurs par défaut retenues sont listées
    dans le résumé.
-2. **Contrôles** (`temoin check --json`) : une erreur arrête tout, avec la
+2. **Contrôles** (`indicator check --json`) : une erreur arrête tout, avec la
    correction du preset proposée (par exemple le cadre conseillé du contrôle
    `mount.frame`), appliquée seulement après accord ; un
    avertissement n'arrête pas et figure dans le résumé.
-3. **Génération** (`temoin generate`) vers `export/`, tous formats.
+3. **Génération** (`indicator generate`) vers `export/`, tous formats.
 4. **Résumé** : contrôles, nomenclature, fichiers écrits, valeurs par défaut
    retenues.
 5. **Sur demande** : intégration (ci-dessous).
@@ -132,7 +132,7 @@ les opérations.
 
 ## Version
 
-Une seule : le skill s'appuie sur `temoin` (Node), sans Fusion ; Fusion ne
+Une seule : le skill s'appuie sur `indicator` (Node), sans Fusion ; Fusion ne
 sert qu'à l'intégration. La v0 sur les scripts de la maquette, envisagée,
 est abandonnée (30/10/2026) : la ligne de commande vient avant le skill.
 
@@ -140,7 +140,7 @@ est abandonnée (30/10/2026) : la ligne de commande vient avant le skill.
 
 - [x] Chargement d'un skill par lien symbolique : vérifié le 30/10/2026,
       le skill est listé par une session lancée dans le Claudemètre.
-- [x] Appel de l'outil depuis le skill global : `temoin` installé par
+- [x] Appel de l'outil depuis le skill global : `indicator` installé par
       `npm link` (30/10/2026), chemin absolu du dépôt en repli.
 - [ ] Convention `design/temoin/` à confirmer.
 - [x] Questions du skill tirées du preset v1 (`presets/schema.json`, figé

@@ -10,7 +10,7 @@ import '@fontsource/b612/700.css';
 import '@fontsource/b612-mono/400.css';
 import './style.css';
 import schema from '../../presets/schema.json' with { type: 'json' };
-import type { PreviewPart } from '@temoin/core';
+import type { PreviewPart } from '@indicator/core';
 import { createEngine } from './engine-client.ts';
 import { drawFace, lightFace } from './face.ts';
 import type { FaceModel } from './face-model.ts';
@@ -40,7 +40,7 @@ const fileInput = $<HTMLInputElement>('#file'), examples = $<HTMLDetailsElement>
 
 // Name of the files: the one typed in (or the opened preset's), else derived from the text ("ALARME" → alarme).
 const slug = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
-  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'temoin';
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'indicator';
 const fileName = () => nameInput.value.trim().replace(/[\s\\/:*?"<>|]+/g, '-') || nameInput.placeholder;
 
 // Checks: one request at a time, only the latest input waiting.
@@ -50,7 +50,7 @@ let lastFace: FaceModel | undefined;
 
 const layout = rows(schema as SchemaNode);
 const form = createForm($('#fields'), layout, () => { opened = undefined; changed(); });
-// Opened preset (file, example, link): checked as is, like temoin check does, until the
+// Opened preset (file, example, link): checked as is, like indicator check does, until the
 // first input; then the form's (keys without a field are dropped).
 let opened: object | undefined;
 const current = () => opened ?? form.read();
@@ -77,7 +77,7 @@ const item = (tag: string, className: string, text: string) => Object.assign(doc
 checker.onmessage = ({ data }: MessageEvent<FromChecker>) => {
   checking = false;
   if (stale) return sendCheck();   // result overtaken by an input: not shown
-  // Same lines as temoin check; preset errors are also shown under their field.
+  // Same lines as indicator check; preset errors are also shown under their field.
   form.errors(data.checks.filter((c) => c.code === 'preset').map((c) => c.message));
   checksList.replaceChildren(...data.checks.map((c) => item('li', `check ${c.level}`, `${MARK[c.level]} ${c.message}`)));
   summary.replaceChildren(...(data.summary ?? []).flatMap(([label, text]) => [item('dt', '', label), item('dd', '', text)]));
@@ -111,7 +111,7 @@ for (const button of $$('#mode button')) {
   });
 }
 
-// Light: effect and colour, the same in both views; the front view is animated here, the 3D
+// Light: effect and color, the same in both views; the front view is animated here, the 3D
 // view in its own render loop.
 let light: Light = { effect: 'steady', color: '#ffffff' }, faceFrame = 0;
 const colorInput = $<HTMLInputElement>('#light-color');
@@ -195,7 +195,7 @@ async function runPreview(): Promise<void> {
   showCaption();
 }
 
-// Pieces shown or hidden, with their colour.
+// Pieces shown or hidden, with their color.
 function listPieces(parts: PreviewPart[]): void {
   piecesList.replaceChildren(...parts.map((p) => {
     const button = item('button', 'piece', '') as HTMLButtonElement;
@@ -300,7 +300,7 @@ function load(preset: object, name: string, origin: string): void {
   changed();
 }
 
-// File picked or dropped: the name of the files becomes its own, as with temoin.
+// File picked or dropped: the name of the files becomes its own, as with indicator.
 async function openFile(file: File): Promise<void> {
   let data: unknown;
   try {

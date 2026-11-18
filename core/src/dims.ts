@@ -1,6 +1,6 @@
 // Dimensions of the indicator (mm), computed from the preset and the values fixed in v1,
 // taken from the parameters of the mock-up's temoin.py (validated prints). Indicator
-// frame of reference: origin at the centre of the window, on the panel plane (back of the
+// frame of reference: origin at the center of the window, on the panel plane (back of the
 // frame and of the legend), x to the right, z up, y towards the wall.
 import type { Preset } from './preset.ts';
 
@@ -45,7 +45,7 @@ export function dimensions(p: Preset) {
     // Test panel of the mock-up (60 × 40 for a 47 × 18 frame), grown with the frame.
     testW: Math.max(60, frameW + 13), testH: Math.max(40, frameH + 22),
     head: p.mount.head,
-    screwSpacing: (windowW + frameW) / 2,   // screws centred between the window and the frame edge
+    screwSpacing: (windowW + frameW) / 2,   // screws centered between the window and the frame edge
     insertHoleL: M3.insertL + INSERT_EXTRA,
     bossD: M3.insertD + 2.6,
     flangeT: 2.5, boxWall,

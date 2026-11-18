@@ -1,4 +1,4 @@
-// Front view (SVG): frame, window, letters and screw heads in the preset colours. The light
+// Front view (SVG): frame, window, letters and screw heads in the preset colors. The light
 // (light.ts) tints the letters and adds a halo, clipped to the window as by the mask;
 // lightFace() only updates them, for the animated effects.
 import type { FaceModel } from './face-model.ts';
@@ -43,7 +43,7 @@ export function drawFace(svg: SVGSVGElement, m: FaceModel): void {
   );
 }
 
-// Letters in the light colour at brightness k (0: off, the white veil), halo with them.
+// Letters in the light color at brightness k (0: off, the white veil), halo with them.
 export function lightFace(svg: SVGSVGElement, color: string, k: number): void {
   const ink = svg.querySelector<SVGPathElement>('.ink'), halo = svg.querySelector<SVGPathElement>('.halo');
   if (!ink || !halo) return;

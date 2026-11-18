@@ -1,6 +1,6 @@
 // Settings form, built from the rows of fields.ts: fills in and reads back a preset, and
 // shows the preset errors under their field ("path : message" lines from the core). A value
-// a field cannot show (colour "red", unknown option) is kept as is until that field is
+// a field cannot show (color "red", unknown option) is kept as is until that field is
 // edited: its error stays, nothing is changed silently.
 import type { Field, Row } from './fields.ts';
 
