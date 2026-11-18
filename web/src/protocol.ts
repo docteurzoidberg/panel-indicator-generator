@@ -1,10 +1,10 @@
 // Messages between the page (main.ts) and its two workers: checks (checker.ts, without
 // OpenCascade, on every input) and the OpenCascade engine (engine.ts, through
 // engine-client.ts: 3D preview and files).
-import type { Check, PreviewPart } from '@indicator/core';
+import type { Check, Lang, PreviewPart } from '@indicator/core';
 import type { FaceModel } from './face-model.ts';
 
-export type ToChecker = { id: number; preset: unknown };
+export type ToChecker = { id: number; preset: unknown; lang: Lang };   // messages in the page's language
 
 export type FromChecker = {
   id: number;
@@ -16,8 +16,8 @@ export type FromChecker = {
 };
 
 export type EngineRequest =
-  | { type: 'preview'; preset: unknown }
-  | { type: 'generate'; name: string; preset: unknown };
+  | { type: 'preview'; preset: unknown; lang: Lang }
+  | { type: 'generate'; name: string; preset: unknown; lang: Lang };
 
 export type ToEngine = EngineRequest & { id: number };
 

@@ -1,14 +1,21 @@
 // Settings form, built from the rows of fields.ts: fills in and reads back a preset, and
-// shows the preset errors under their field ("path : message" lines from the core). A value
+// shows the preset errors under their field ("path: message" lines from the core, "path :
+// message" in French). Its texts follow the page's language (relabel). A value
 // a field cannot show (color "red", unknown option) is kept as is until that field is
 // edited: its error stays, nothing is changed silently.
 import type { Field, Row } from './fields.ts';
+
+// Texts of the form in the page's language.
+export interface FormTexts { required: string; separator: string; list: string }
 
 type Input = HTMLInputElement | HTMLSelectElement;
 interface Entry { field: Field; input: Input; error: HTMLElement; sync?: (shown?: string) => void; kept?: unknown }
 
 const get = (o: unknown, path: string): unknown =>
   path.split('.').reduce<unknown>((v, k) => (v && typeof v === 'object' ? (v as Record<string, unknown>)[k] : undefined), o);
+
+// Preset error line: path and message (": " or " : " between them).
+const errorLine = (line: string) => line.match(/^(\S+?) ?: ([\s\S]*)$/);
 
 function control(f: Field): Input {
   if (f.kind === 'select') {
@@ -20,18 +27,29 @@ function control(f: Field): Input {
   i.type = f.kind;
   if (f.kind === 'number') Object.assign(i, { min: '0', step: '0.1', inputMode: 'decimal' });
   if (f.kind === 'text') Object.assign(i, { autocomplete: 'off', spellcheck: false });
-  if (f.required && f.kind === 'text') i.placeholder = 'obligatoire';
   return i;
 }
 
-export function createForm(container: HTMLElement, layout: Row[], onInput: () => void) {
+// Texts of a field: label (fields sharing a row), hint, option labels, placeholder.
+function labelField(entry: Entry, shared: boolean, t: FormTexts): void {
+  const { field: f, input } = entry;
+  if (f.hint) input.title = f.hint;
+  if (shared) input.setAttribute('aria-label', f.label);
+  if (input instanceof HTMLSelectElement) for (const o of input.options) o.text = f.options?.find(([v]) => v === o.value)?.[1] ?? o.value;
+  else if (f.required && f.kind === 'text') input.placeholder = t.required;
+}
+
+export function createForm(container: HTMLElement, layout: Row[], onInput: () => void, texts: FormTexts) {
   const inputs = new Map<string, Entry>();
+  const rowLabels: HTMLElement[] = [];
+  let t = texts;
   for (const row of layout) {
     const el = document.createElement('div');
     el.className = 'row';
     const label = document.createElement(row.fields.length > 1 ? 'span' : 'label');
     label.className = 'row-label';
     label.textContent = row.label;
+    rowLabels.push(label);
     const controls = document.createElement('div');
     controls.className = 'controls';
     const error = document.createElement('p');
@@ -42,9 +60,8 @@ export function createForm(container: HTMLElement, layout: Row[], onInput: () =>
       const entry: Entry = { field, input, error };
       input.id = `f-${field.path}`;
       input.name = field.path;
-      if (field.hint) input.title = field.hint;
-      if (row.fields.length > 1) input.setAttribute('aria-label', field.label);
-      else (label as HTMLLabelElement).htmlFor = input.id;
+      labelField(entry, row.fields.length > 1, t);
+      if (row.fields.length === 1) (label as HTMLLabelElement).htmlFor = input.id;
       input.setAttribute('aria-describedby', error.id);
       input.addEventListener('input', () => { entry.kept = undefined; onInput(); });
       if (k) controls.append(Object.assign(document.createElement('span'), { className: 'times', textContent: '×' }));
@@ -63,9 +80,24 @@ export function createForm(container: HTMLElement, layout: Row[], onInput: () =>
     container.append(el);
   }
 
-  return {
+  let lastErrors: string[] = [];
+
+  const form = {
+    // Rows of another language: same fields, new texts; values and focus are kept.
+    relabel(next: Row[], texts: FormTexts): void {
+      t = texts;
+      next.forEach((row, i) => {
+        rowLabels[i].textContent = row.label;
+        for (const field of row.fields) {
+          const entry = inputs.get(field.path)!;
+          entry.field = field;
+          labelField(entry, row.fields.length > 1, t);
+        }
+      });
+      form.errors(lastErrors);
+    },
     // Preset read from the form: an empty field is left out (default value, or
-    // "obligatoire" in the errors).
+    // "required" in the errors).
     read(): Record<string, unknown> {
       const preset: Record<string, Record<string, unknown>> = {};
       for (const [path, { field, input, kept }] of inputs) {
@@ -93,15 +125,20 @@ export function createForm(container: HTMLElement, layout: Row[], onInput: () =>
     // Preset errors under their field (those aimed at no field stay in the list of
     // checks).
     errors(lines: string[]): void {
+      lastErrors = lines;
       const byRow = new Map<HTMLElement, string[]>();
       for (const { error } of inputs.values()) byRow.set(error, []);
+      const invalid = new Set<string>();
       for (const line of lines) {
-        const [path, ...message] = line.split(' : ');
-        const target = inputs.get(path);
-        if (target) byRow.get(target.error)!.push(`${target.field.label} : ${message.join(' : ')}`);
+        const [, path, message] = errorLine(line) ?? [];
+        const target = path ? inputs.get(path) : undefined;
+        if (!target) continue;
+        invalid.add(path);
+        byRow.get(target.error)!.push(`${target.field.label}${t.separator}${message}`);
       }
-      for (const [error, messages] of byRow) error.textContent = messages.join(' ; ');
-      for (const [path, { input }] of inputs) input.setAttribute('aria-invalid', String(lines.some((l) => l.startsWith(`${path} : `))));
+      for (const [error, messages] of byRow) error.textContent = messages.join(t.list);
+      for (const [path, { input }] of inputs) input.setAttribute('aria-invalid', String(invalid.has(path)));
     },
   };
+  return form;
 }

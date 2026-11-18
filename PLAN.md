@@ -37,7 +37,7 @@ Les étapes se lancent une à une, à la demande de l'utilisateur.
 5. **Page web** *(fait le 31/10/2026, branche `etape-5-web`)* : réglages ou preset ouvert (celui d'un projet hôte, par
    exemple), aperçu en temps réel (éclaté ou assemblé, éteint
    ou allumé) et téléchargements, dans le navigateur, sans serveur.
-6. **Anglais par défaut, nouveau dépôt** *(décidée le 18/11/2026 ; lots 6.1 à 6.3
+6. **Anglais par défaut, nouveau dépôt** *(décidée le 18/11/2026 ; lots 6.1 à 6.4
    faits le 18/11/2026)* : le projet passe dans un nouveau dépôt
    `panel-indicator-generator`, en anglais américain, qui devient la
    référence ; ce dépôt-ci, en français, est gardé un temps puis gelé. En
@@ -64,10 +64,12 @@ Les étapes se lancent une à une, à la demande de l'utilisateur.
       STEP identiques, STL et 3MF de même géométrie (OpenCascade peut
       couper un quadrilatère plat par l'autre diagonale dans le navigateur ;
       vu avec ALARM, décidé le 18/11/2026).
-   4. *Page multilingue* : anglais par défaut, français au choix ; langue
-      du navigateur, choix dans l'en-tête retenu par la page ; format des
-      liens de partage inchangé ; tests de la page en anglais et en
-      français.
+   4. *Page multilingue* : langue du navigateur si c'est l'anglais ou le
+      français, sinon l'anglais ; choix EN / FR dans l'en-tête, retenu par
+      la page (navigateur) et appliqué sur place, sans rechargement ;
+      textes de la page dans `web/src/texts.ts` ; `licenses.txt` en
+      anglais ; format des liens de partage inchangé ; tests de la page en
+      anglais et en français.
    5. *Docs* : anglais à leur place ; version française du README, de
       `generateur.md` et de `skill.md` (`README.fr.md`, `docs/fr/`) ; les
       journaux (`PLAN.md`, `plan-generateur.md`) en anglais seulement ;

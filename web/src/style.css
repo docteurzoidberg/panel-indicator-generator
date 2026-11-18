@@ -49,10 +49,15 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.2rem
 .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px 14px; }
 .tools { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* Theme switch, top right of the header: sun and moon on a track, the thumb covers the active one. */
+/* Top right of the header: language (EN / FR) and theme switch, sun and moon on a track,
+   the thumb covering the active one. */
 .top { position: relative; }
-.intro { padding-right: 72px; }
-.theme { position: absolute; top: 0; right: 0; width: 56px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; color: var(--muted); }
+.intro { padding-right: 160px; }
+.switches { position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 10px; }
+@media (max-width: 600px) { .intro { padding-right: 0; } .intro .eyebrow { min-height: 28px; padding-right: 150px; } }
+.lang { flex-wrap: nowrap; gap: 4px; }
+.lang button { height: 28px; padding: 0 8px; font-size: 12px; letter-spacing: .04em; }
+.theme { position: relative; flex: none; width: 56px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; color: var(--muted); }
 .theme:hover { border-color: var(--olive); }
 .theme .icon { width: 16px; height: 16px; margin: 0 5px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .theme .moon { fill: currentColor; stroke-width: 1.5; }

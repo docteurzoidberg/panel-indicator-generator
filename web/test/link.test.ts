@@ -6,7 +6,7 @@ import { presetJsonSchema } from '@indicator/core';
 import { rows, type SchemaNode } from '../src/fields.ts';
 import { fromHash, toHash } from '../src/link.ts';
 
-const layout = rows(presetJsonSchema() as SchemaNode);
+const layout = rows(presetJsonSchema() as SchemaNode, 'en');
 const { $schema, ...alarm } = JSON.parse(readFileSync(new URL('../../presets/alarm.json', import.meta.url), 'utf8'));
 
 test('alarm: same preset and same name after the link, without $schema', () => {

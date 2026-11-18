@@ -1,38 +1,50 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Témoin lumineux</title>
+<title>Panel indicator</title>
 <script>
-  // Theme chosen with the button (main.ts), applied before the first paint.
+  // Theme and language chosen with their buttons (main.ts), applied before the first paint;
+  // the texts follow in main.ts (texts.ts).
   try { const theme = localStorage.getItem('theme'); if (theme === 'dark' || theme === 'light') document.documentElement.dataset.theme = theme; } catch {}
+  try {
+    const kept = localStorage.getItem('lang');
+    const lang = kept === 'en' || kept === 'fr' ? kept : (navigator.languages || [navigator.language]).map((l) => l.toLowerCase().split('-')[0]).find((l) => l === 'en' || l === 'fr');
+    if (lang) document.documentElement.lang = lang;
+  } catch {}
 </script>
-<meta name="description" content="Générateur de témoins lumineux encastrables imprimés en 3D : réglages, contrôles, aperçu et fichiers d'impression, dans le navigateur.">
+<meta name="description" content="Generator of 3D-printed flush-mount backlit indicators: settings, checks, preview and print files, in the browser.">
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <div class="intro">
-      <p class="eyebrow">Générateur · preset v1</p>
-      <h1>Témoin lumineux</h1>
-      <p class="lead">Une légende éclairée par l’arrière, dans un cadre vissé sur la découpe d’un panneau. Les réglages se contrôlent à chaque saisie ; les fichiers d’impression sont calculés dans le navigateur.</p>
+      <p class="eyebrow" data-i18n="eyebrow">Generator · preset v1</p>
+      <h1 data-i18n="title">Panel indicator</h1>
+      <p class="lead" data-i18n="lead">A backlit legend, in a frame screwed onto a panel cutout. Settings are checked on every input; the print files are computed in the browser.</p>
     </div>
-    <button type="button" class="theme" id="theme" role="switch" aria-checked="false" aria-label="Thème sombre" title="Thème sombre ou clair (par défaut, celui du système)">
-      <svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
-      <svg class="icon moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>
-      <span class="thumb" aria-hidden="true"></span>
-    </button>
+    <div class="switches">
+      <div class="seg lang" id="lang" role="group" aria-label="Language" data-i18n-label="language">
+        <button type="button" data-lang="en" lang="en" aria-pressed="true" title="English">EN</button>
+        <button type="button" data-lang="fr" lang="fr" aria-pressed="false" title="Français">FR</button>
+      </div>
+      <button type="button" class="theme" id="theme" role="switch" aria-checked="false" aria-label="Dark theme" data-i18n-label="darkTheme" title="Dark or light theme (the system’s by default)" data-i18n-title="themeTitle">
+        <svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        <svg class="icon moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>
+        <span class="thumb" aria-hidden="true"></span>
+      </button>
+    </div>
     <div class="presets">
       <div class="actions">
       <div class="tools" role="toolbar" aria-label="Preset">
-        <button type="button" class="tool" id="open" title="Ouvrir un preset .json (ou le glisser sur la page)">Ouvrir</button>
+        <button type="button" class="tool" id="open" title="Open a .json preset (or drop it on the page)" data-i18n="open" data-i18n-title="openTitle">Open</button>
         <details class="menu" id="examples">
-          <summary class="tool">Exemples</summary>
+          <summary class="tool" data-i18n="examples">Examples</summary>
           <div class="menu-list" id="example-list"></div>
         </details>
-        <button type="button" class="tool" id="save" title="Enregistrer le preset (le .json de indicator generate)" disabled>Enregistrer</button>
-        <button type="button" class="tool" id="link" title="Copier le lien de la page, qui porte le preset">Lien</button>
+        <button type="button" class="tool" id="save" title="Save the preset (the .json of indicator generate)" data-i18n="save" data-i18n-title="saveTitle" disabled>Save</button>
+        <button type="button" class="tool" id="link" title="Copy the page link, which carries the preset" data-i18n="link" data-i18n-title="linkTitle">Link</button>
       </div>
       <p class="status" id="preset-status" role="status"></p>
       <input type="file" id="file" accept=".json,application/json" hidden>
@@ -42,17 +54,17 @@
   <div class="layout">
     <div class="side">
       <section class="panel" aria-labelledby="h-settings">
-        <h2 id="h-settings">Réglages</h2>
+        <h2 id="h-settings" data-i18n="settings">Settings</h2>
         <form id="fields" autocomplete="off" onsubmit="return false">
           <div class="row">
-            <label class="row-label" for="name">Nom des fichiers</label>
+            <label class="row-label" for="name" data-i18n="fileName">File name</label>
             <div class="controls"><input id="name" type="text" spellcheck="false" aria-describedby="name-hint"></div>
-            <p class="field-hint" id="name-hint">Vide : tiré du texte.</p>
+            <p class="field-hint" id="name-hint" data-i18n="fileNameHint">Empty: taken from the text.</p>
           </div>
         </form>
       </section>
       <section class="panel" aria-labelledby="h-mount">
-        <h2 id="h-mount">Montage</h2>
+        <h2 id="h-mount" data-i18n="mounting">Mounting</h2>
         <dl class="summary" id="summary"></dl>
       </section>
     </div>
@@ -60,63 +72,63 @@
     <div class="main">
       <section class="panel" aria-labelledby="h-preview">
         <div class="panel-head">
-          <h2 id="h-preview">Aperçu</h2>
-          <div class="seg" id="mode" role="group" aria-label="Vue">
+          <h2 id="h-preview" data-i18n="preview">Preview</h2>
+          <div class="seg" id="mode" role="group" aria-label="View" data-i18n-label="view">
             <button type="button" data-mode="3d" aria-pressed="true">3D</button>
-            <button type="button" data-mode="face" aria-pressed="false">Face</button>
+            <button type="button" data-mode="face" aria-pressed="false" data-i18n="front">Front view</button>
           </div>
         </div>
         <div class="stage" id="stage" hidden>
-          <svg id="face" role="img" aria-label="Vue de face du témoin"></svg>
+          <svg id="face" role="img" aria-label="Front view of the indicator" data-i18n-label="frontView"></svg>
         </div>
         <div class="stage3d" id="stage3d">
-          <p class="hint">Glisser : tourner · molette : zoom · clic droit : déplacer</p>
+          <p class="hint" data-i18n="hint3d">Drag: rotate · wheel: zoom · right click: pan</p>
         </div>
         <div class="light-row">
-          <span class="row-title">Lumière</span>
-          <div class="seg" id="light-state" role="group" aria-label="Lumière de la légende">
-            <button type="button" data-effect="off" aria-pressed="false">Éteinte</button>
-            <button type="button" data-effect="steady" aria-pressed="true">Fixe</button>
-            <button type="button" data-effect="breathe" aria-pressed="false">Respiration</button>
-            <button type="button" data-effect="blink" aria-pressed="false">Clignotement</button>
+          <span class="row-title" data-i18n="light">Light</span>
+          <div class="seg" id="light-state" role="group" aria-label="Light of the legend" data-i18n-label="legendLight">
+            <button type="button" data-effect="off" aria-pressed="false" data-i18n="off">Off</button>
+            <button type="button" data-effect="steady" aria-pressed="true" data-i18n="steady">Steady</button>
+            <button type="button" data-effect="breathe" aria-pressed="false" data-i18n="breathe">Breathing</button>
+            <button type="button" data-effect="blink" aria-pressed="false" data-i18n="blink">Blinking</button>
           </div>
-          <div class="colors" id="light-colors" role="group" aria-label="Couleur de la lumière (simulation, hors preset)">
-            <button type="button" data-color="#ffffff" aria-pressed="true" title="Blanc" aria-label="Blanc" style="--c: #ffffff"></button>
-            <button type="button" data-color="#ffb000" aria-pressed="false" title="Ambre" aria-label="Ambre" style="--c: #ffb000"></button>
-            <button type="button" data-color="#ff2000" aria-pressed="false" title="Rouge" aria-label="Rouge" style="--c: #ff2000"></button>
-            <button type="button" data-color="#00e040" aria-pressed="false" title="Vert" aria-label="Vert" style="--c: #00e040"></button>
-            <button type="button" data-color="#2050ff" aria-pressed="false" title="Bleu" aria-label="Bleu" style="--c: #2050ff"></button>
-            <input type="color" id="light-color" value="#ffffff" aria-label="Autre couleur" title="Autre couleur">
+          <div class="colors" id="light-colors" role="group" aria-label="Light color (simulation, not in the preset)" data-i18n-label="lightColor">
+            <button type="button" data-color="#ffffff" aria-pressed="true" title="White" aria-label="White" data-i18n-title="white" data-i18n-label="white" style="--c: #ffffff"></button>
+            <button type="button" data-color="#ffb000" aria-pressed="false" title="Amber" aria-label="Amber" data-i18n-title="amber" data-i18n-label="amber" style="--c: #ffb000"></button>
+            <button type="button" data-color="#ff2000" aria-pressed="false" title="Red" aria-label="Red" data-i18n-title="red" data-i18n-label="red" style="--c: #ff2000"></button>
+            <button type="button" data-color="#00e040" aria-pressed="false" title="Green" aria-label="Green" data-i18n-title="green" data-i18n-label="green" style="--c: #00e040"></button>
+            <button type="button" data-color="#2050ff" aria-pressed="false" title="Blue" aria-label="Blue" data-i18n-title="blue" data-i18n-label="blue" style="--c: #2050ff"></button>
+            <input type="color" id="light-color" value="#ffffff" aria-label="Other color" title="Other color" data-i18n-title="otherColor" data-i18n-label="otherColor">
           </div>
         </div>
         <div class="controls3d" id="controls3d">
           <div class="range-row">
-            <span>assemblé</span>
-            <input type="range" id="explode" min="0" max="100" value="100" aria-label="Écartement des pièces">
-            <span>éclaté</span>
+            <span data-i18n="assembled">assembled</span>
+            <input type="range" id="explode" min="0" max="100" value="100" aria-label="Spacing of the pieces" data-i18n-label="spacing">
+            <span data-i18n="exploded">exploded</span>
           </div>
-          <div class="seg" id="views" role="group" aria-label="Point de vue">
-            <button type="button" data-view="iso">Trois-quarts</button>
-            <button type="button" data-view="face">De face</button>
-            <button type="button" data-view="side">Profil</button>
-            <button type="button" data-view="back">Dos</button>
+          <div class="seg" id="views" role="group" aria-label="Viewpoint" data-i18n-label="viewpoint">
+            <button type="button" data-view="iso" data-i18n="iso">Three-quarter</button>
+            <button type="button" data-view="face" data-i18n="frontSide">Front</button>
+            <button type="button" data-view="side" data-i18n="side">Side</button>
+            <button type="button" data-view="back" data-i18n="back">Back</button>
           </div>
-          <div class="pieces" id="pieces" role="group" aria-label="Pièces affichées"></div>
+          <div class="pieces" id="pieces" role="group" aria-label="Pieces shown" data-i18n-label="piecesShown"></div>
         </div>
-        <p class="caption" id="caption">Vue de face, à l’échelle.</p>
+        <p class="caption" id="caption"></p>
       </section>
 
       <section class="panel" aria-labelledby="h-checks">
-        <h2 id="h-checks">Contrôles</h2>
+        <h2 id="h-checks" data-i18n="checks">Checks</h2>
         <ul class="checks" id="checks" aria-live="polite"></ul>
       </section>
 
       <section class="panel" aria-labelledby="h-download">
-        <h2 id="h-download">Télécharger</h2>
-        <p class="muted">3MF à trancher, STL, STEP pour l’intégration et le preset : les fichiers de <code>indicator generate</code>, en un zip.</p>
+        <h2 id="h-download" data-i18n="download">Download</h2>
+        <p class="muted" data-i18n-html="downloadText">Slicable 3MF, STL, STEP for integration and the preset: the files of <code>indicator generate</code>, in one zip.</p>
         <div class="download">
-          <button type="button" id="download" class="primary" disabled>Télécharger le zip</button>
-          <p class="status" id="status" role="status">Démarrage du moteur…</p>
+          <button type="button" id="download" class="primary" data-i18n="downloadZip" disabled>Download the zip</button>
+          <p class="status" id="status" role="status"></p>
         </div>
       </section>
     </div>
@@ -124,24 +136,24 @@
 
   <footer class="credits">
     <div>
-      <p class="signature">vibe codé avec le <span class="emoji">🍑</span> par DrZoid</p>
-      <p><a href="https://github.com/docteurzoidberg/panel-indicator-generator">Sources sur GitHub</a> · code sous <a href="https://www.wtfpl.net/">WTFPL</a>, sans garantie</p>
+      <p class="signature" data-i18n-html="signature">vibe coded with the <span class="emoji">🍑</span> by DrZoid</p>
+      <p data-i18n-html="sources"><a href="https://github.com/docteurzoidberg/panel-indicator-generator">Sources on GitHub</a> · code under <a href="https://www.wtfpl.net/">WTFPL</a>, without warranty</p>
     </div>
     <div>
-      <h2>Hors ligne</h2>
-      <p>Une fois chargée, la page marche sans réseau : tout se calcule dans le navigateur.</p>
+      <h2 data-i18n="offline">Offline</h2>
+      <p data-i18n="offlineText">Once loaded, the page works without network: everything is computed in the browser.</p>
     </div>
     <div>
-      <h2>Licences</h2>
+      <h2 data-i18n="licenses">Licenses</h2>
       <ul>
-        <li>Calcul des pièces : <a href="https://github.com/Open-Cascade-SAS/OCCT">Open CASCADE</a>, LGPL 2.1, en WebAssembly dans un fichier à part (<a href="https://github.com/sgenoud/replicad/tree/main/packages/replicad-opencascadejs">sources</a>)</li>
-        <li>Polices Barlow Condensed et B612 : SIL Open Font License 1.1</li>
-        <li>Toutes les bibliothèques et leurs textes : <a href="licenses.txt">licenses.txt</a></li>
+        <li data-i18n-html="licenseOcc">Computation of the pieces: <a href="https://github.com/Open-Cascade-SAS/OCCT">Open CASCADE</a>, LGPL 2.1, in WebAssembly in a separate file (<a href="https://github.com/sgenoud/replicad/tree/main/packages/replicad-opencascadejs">sources</a>)</li>
+        <li data-i18n="licenseFonts">Barlow Condensed and B612 fonts: SIL Open Font License 1.1</li>
+        <li data-i18n-html="licenseAll">All the libraries and their texts: <a href="licenses.txt">licenses.txt</a></li>
       </ul>
     </div>
   </footer>
 </div>
-<div class="drop" id="drop" hidden><p>Déposer le preset (.json)</p></div>
+<div class="drop" id="drop" hidden><p data-i18n="drop">Drop the preset (.json)</p></div>
 <script type="module" src="./src/main.ts"></script>
 </body>
 </html>

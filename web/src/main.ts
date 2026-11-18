@@ -3,8 +3,8 @@
 // files on download (OpenCascade worker, engine.ts); simulated light of the legend.
 // Presets: opened (picked or dropped on the page), examples from presets/, saved, and
 // carried by the page link. On load: the preset of the link, else the alarm example.
-// Offline once loaded, built page only (service worker, src/sw.js). Texts shown to the
-// user are in French (lang.ts) for now.
+// Offline once loaded, built page only (service worker, src/sw.js). Texts in English or
+// French (texts.ts), switched in place: every text shown is computed from the language.
 import '@fontsource/b612/400.css';
 import '@fontsource/b612/700.css';
 import '@fontsource/b612-mono/400.css';
@@ -14,11 +14,12 @@ import type { PreviewPart } from '@indicator/core';
 import { createEngine } from './engine-client.ts';
 import { drawFace, lightFace } from './face.ts';
 import type { FaceModel } from './face-model.ts';
-import { PIECES, rows, type SchemaNode } from './fields.ts';
+import { rows, type SchemaNode } from './fields.ts';
 import { createForm } from './form.ts';
 import { animated, intensity, type Effect, type Light } from './light.ts';
 import { fromHash, toHash } from './link.ts';
 import type { FromChecker, ToChecker } from './protocol.ts';
+import { applyTexts, initialLang, keepLang, TEXTS, type Lang } from './texts.ts';
 import type { Viewer, ViewName } from './viewer.ts';
 
 // Examples: the presets of the repository, by file name.
@@ -29,7 +30,11 @@ const EXAMPLES = Object.fromEntries(Object.entries(import.meta.glob<string>(
 const $ = <T extends Element = HTMLElement>(selector: string) => document.querySelector(selector) as T;
 const $$ = <T extends Element = HTMLButtonElement>(selector: string) => [...document.querySelectorAll<T>(selector)];
 const MARK = { ok: '✓', warn: '⚠', error: '✗' } as const;
-const seconds = (ms: number) => `${(ms / 1000).toFixed(1).replace('.', ',')} s`;
+
+// Language: the static texts at once, the others as they are written.
+let lang: Lang = initialLang(), t = TEXTS[lang];
+applyTexts(lang);
+const formTexts = () => ({ required: t.required, separator: t.separator, list: t.list });
 
 const nameInput = $<HTMLInputElement>('#name');
 const checksList = $('#checks'), summary = $('#summary'), status = $('#status'), presetStatus = $('#preset-status');
@@ -48,8 +53,8 @@ const checker = new Worker(new URL('./checker.ts', import.meta.url), { type: 'mo
 let checkId = 0, checking = false, stale = false, checkedOk = false, json: string | undefined;
 let lastFace: FaceModel | undefined;
 
-const layout = rows(schema as SchemaNode);
-const form = createForm($('#fields'), layout, () => { opened = undefined; changed(); });
+const layout = rows(schema as SchemaNode, lang);
+const form = createForm($('#fields'), layout, () => { opened = undefined; changed(); }, formTexts());
 // Opened preset (file, example, link): checked as is, like indicator check does, until the
 // first input; then the form's (keys without a field are dropped).
 let opened: object | undefined;
@@ -69,7 +74,7 @@ function sendCheck(): void {
   if (checking || !stale) return;
   checking = true;
   stale = false;
-  checker.postMessage({ id: ++checkId, preset: current() } satisfies ToChecker);
+  checker.postMessage({ id: ++checkId, preset: current(), lang } satisfies ToChecker);
 }
 
 const item = (tag: string, className: string, text: string) => Object.assign(document.createElement(tag), { className, textContent: text });
@@ -81,12 +86,13 @@ checker.onmessage = ({ data }: MessageEvent<FromChecker>) => {
   form.errors(data.checks.filter((c) => c.code === 'preset').map((c) => c.message));
   checksList.replaceChildren(...data.checks.map((c) => item('li', `check ${c.level}`, `${MARK[c.level]} ${c.message}`)));
   summary.replaceChildren(...(data.summary ?? []).flatMap(([label, text]) => [item('dt', '', label), item('dd', '', text)]));
-  if (!data.summary) summary.append(item('dd', 'muted', 'Le montage s’affiche quand les contrôles passent.'));
+  if (!data.summary) summary.append(item('dd', 'muted', t.mountingPending));
   if (data.face) lastFace = data.face;
   if (lastFace) { drawFace(face, lastFace); paintFace(); }
   else face.replaceChildren();
   stage.classList.toggle('is-stale', !data.face);
-  faceCaption = data.face ? 'Vue de face, à l’échelle.' : lastFace ? 'Dernier aperçu valide : corriger les réglages signalés.' : 'Pas d’aperçu : corriger les réglages signalés.';
+  const shown = data.face ? 'faceShown' : lastFace ? 'faceStale' : 'faceNone';
+  faceCaption = () => t[shown];
   showCaption();
   checkedOk = data.ok;
   json = data.json;
@@ -95,8 +101,8 @@ checker.onmessage = ({ data }: MessageEvent<FromChecker>) => {
 
 // Preview: the 3D view (computed in a few seconds), or the front view at once.
 let mode: 'face' | '3d' = '3d';
-let faceCaption = 'Vue de face, à l’échelle.', caption3d = 'Calcul de la vue 3D…';
-const showCaption = () => { caption.textContent = mode === 'face' ? faceCaption : caption3d; };
+let faceCaption = () => t.faceShown, caption3d = () => t.computing3d;
+const showCaption = () => { caption.textContent = mode === 'face' ? faceCaption() : caption3d(); };
 
 for (const button of $$('#mode button')) {
   button.addEventListener('click', () => {
@@ -154,7 +160,7 @@ function loadViewer(): Promise<Viewer | undefined> {
     viewer.setActive(mode === '3d');
     return viewer;
   }, (e: unknown) => {
-    caption3d = `Vue 3D indisponible : ${(e as Error).message}`;
+    caption3d = () => t.view3dUnavailable((e as Error).message);
     showCaption();
     return undefined;
   });
@@ -175,27 +181,29 @@ async function runPreview(): Promise<void> {
   if (!v) { previewing = false; return; }
   previewDirty = false;
   const at = edits;
-  if (!previewShown) { caption3d = 'Calcul de la vue 3D…'; showCaption(); }
-  const reply = await engine.request({ type: 'preview', preset: current() }).catch((e: Error) => ({ type: 'error', message: e.message }) as const);
+  if (!previewShown) { caption3d = () => t.computing3d; showCaption(); }
+  const reply = await engine.request({ type: 'preview', preset: current(), lang }).catch((e: Error) => ({ type: 'error', message: e.message }) as const);
   previewing = false;
   if (at !== edits) return schedulePreview();   // overtaken by an input: dropped
   const ok = reply.type === 'preview' && reply.ok;
   if (ok) {
     v.show(reply.parts);
-    listPieces(reply.parts);
+    listPieces(shownParts = reply.parts);
     previewShown = true;
     stage3d.dataset.built = reply.built.join(' ');   // for the tests: what was computed, time, heap (MB)
     stage3d.dataset.ms = String(Math.round(reply.ms));
     stage3d.dataset.heap = String(Math.round(reply.heap / 2 ** 20));
-    caption3d = reply.built.length ? `Vue 3D, recalculée en ${seconds(reply.ms)}.` : 'Vue 3D.';
+    const { ms } = reply, recomputed = reply.built.length > 0;
+    caption3d = () => t.view3d(recomputed ? t.seconds(ms) : undefined);
   } else {
-    caption3d = previewShown ? 'Dernière vue 3D valide : corriger les réglages signalés.' : 'Pas de vue 3D : corriger les réglages signalés.';
+    caption3d = previewShown ? () => t.view3dStale : () => t.view3dNone;
   }
   stage3d.classList.toggle('is-stale', !ok);
   showCaption();
 }
 
 // Pieces shown or hidden, with their color.
+let shownParts: PreviewPart[] = [];
 function listPieces(parts: PreviewPart[]): void {
   piecesList.replaceChildren(...parts.map((p) => {
     const button = item('button', 'piece', '') as HTMLButtonElement;
@@ -203,7 +211,7 @@ function listPieces(parts: PreviewPart[]): void {
     button.setAttribute('aria-pressed', String(!hidden.has(p.name)));
     const swatch = item('span', 'swatch', '');
     swatch.style.background = p.color;
-    button.append(swatch, PIECES[p.name] ?? p.label);
+    button.append(swatch, t.pieces[p.name] ?? p.label);
     button.addEventListener('click', () => {
       const show = hidden.has(p.name);
       if (show) hidden.delete(p.name); else hidden.add(p.name);
@@ -222,14 +230,17 @@ for (const button of $$('#views button')) button.addEventListener('click', () =>
 // OpenCascade starts on load; the files are computed on click. A replaced worker (memory)
 // loses its preview cache: the shown preset is computed again, out of sight.
 let engineReady = false, generating = false;
+let statusText = () => t.engineStarting;
+const setStatus = (text: () => string) => { statusText = text; status.textContent = text(); };
+setStatus(statusText);
 const engine = createEngine({
   ready(ms) {
-    if (!engineReady && !status.dataset.started) status.textContent = `Moteur prêt (${seconds(ms)}).`;
+    if (!engineReady && !status.dataset.started) setStatus(() => t.engineReady(t.seconds(ms)));
     status.dataset.started = 'yes';
     engineReady = true;
     updateButtons();
   },
-  failed(message) { status.textContent = `Le moteur n’a pas démarré : ${message}`; },
+  failed(message) { setStatus(() => t.engineFailed(message)); },
   restarting() {
     engineReady = false;
     updateButtons();
@@ -255,13 +266,14 @@ downloadButton.addEventListener('click', async () => {
   generating = true;
   updateButtons();
   const name = fileName(), zipName = `${name}.zip`;
-  status.textContent = 'Génération des fichiers…';
-  const reply = await engine.request({ type: 'generate', name, preset: current() }).catch((e: Error) => ({ type: 'error', message: e.message }) as const);
+  setStatus(() => t.generating);
+  const reply = await engine.request({ type: 'generate', name, preset: current(), lang }).catch((e: Error) => ({ type: 'error', message: e.message }) as const);
   generating = false;
   if (reply.type === 'generated') {
     if (reply.zip) save(reply.zip, zipName, 'application/zip');
-    status.textContent = reply.zip ? `${zipName} : ${reply.files.length} fichiers en ${seconds(reply.ms)}.` : 'Rien n’est généré : le preset a des erreurs.';
-  } else if (reply.type === 'error') status.textContent = `Erreur : ${reply.message}`;
+    const { files, ms } = reply;
+    setStatus(reply.zip ? () => t.generated(zipName, files.length, t.seconds(ms)) : () => t.nothingGenerated);
+  } else if (reply.type === 'error') { const { message } = reply; setStatus(() => t.error(message)); }
   updateButtons();
 });
 
@@ -282,8 +294,10 @@ showTheme();
 
 // Presets. The link follows every input (without a history entry): the reloaded page, or
 // the copied link, reopens the same preset.
-function say(text: string, error = false): void {
-  presetStatus.textContent = text;
+let presetText = () => '';
+function say(text: () => string, error = false): void {
+  presetText = text;
+  presetStatus.textContent = text();
   presetStatus.classList.toggle('is-error', error);
 }
 
@@ -291,7 +305,7 @@ function writeLink(): void {
   history.replaceState(null, '', `#${toHash(current(), nameInput.value.trim())}`);
 }
 
-function load(preset: object, name: string, origin: string): void {
+function load(preset: object, name: string, origin: () => string): void {
   opened = preset;
   form.fill(preset);
   nameInput.value = name;
@@ -306,10 +320,11 @@ async function openFile(file: File): Promise<void> {
   try {
     data = JSON.parse(await file.text());
   } catch (e) {
-    return say(`${file.name} non ouvert : ${(e as Error).message}`, true);
+    const why = (e as Error).message;
+    return say(() => t.notOpened(file.name, why), true);
   }
-  if (!data || typeof data !== 'object' || Array.isArray(data)) return say(`${file.name} non ouvert : objet JSON attendu`, true);
-  load(data, file.name.replace(/\.json$/i, ''), `Ouvert : ${file.name}`);
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return say(() => t.notOpened(file.name, t.objectExpected), true);
+  load(data, file.name.replace(/\.json$/i, ''), () => t.opened(file.name));
 }
 
 $('#open').addEventListener('click', () => fileInput.click());
@@ -342,7 +357,7 @@ for (const name of Object.keys(EXAMPLES).sort()) {
   button.type = 'button';
   button.addEventListener('click', () => {
     examples.open = false;
-    load(JSON.parse(EXAMPLES[name]), '', `Exemple : ${name}`);
+    load(JSON.parse(EXAMPLES[name]), '', () => t.example(name));
   });
   $('#example-list').append(button);
 }
@@ -356,15 +371,15 @@ examples.addEventListener('keydown', (e) => {
 saveButton.addEventListener('click', () => {
   const name = `${fileName()}.json`;
   save(json!, name, 'application/json');
-  say(`Enregistré : ${name}, dans les téléchargements.`);
+  say(() => t.saved(name));
 });
 
 $('#link').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(location.href);
-    say('Lien copié : il rouvre ce preset.');
+    say(() => t.linkCopied);
   } catch {
-    say('Lien dans la barre d’adresse : le copier pour rouvrir ce preset.');
+    say(() => t.linkInBar);
   }
 });
 
@@ -372,11 +387,34 @@ nameInput.addEventListener('input', writeLink);
 
 function openLink(): boolean {
   const linked = fromHash(location.hash, layout);
-  if (linked) load(linked.preset, linked.name, 'Preset du lien');
+  if (linked) load(linked.preset, linked.name, () => t.linkPreset);
   return !!linked;
 }
 addEventListener('hashchange', openLink);   // link pasted in the address bar of the open page
-if (!openLink()) load(JSON.parse(EXAMPLES.alarm), '', 'Exemple : alarm');
+if (!openLink()) load(JSON.parse(EXAMPLES.alarm), '', () => t.example('alarm'));
+
+// Language switch: kept in this browser; every text is written again, the checks come back
+// from the core in the new language.
+const langButtons = $$('#lang button');
+const showLang = () => { for (const b of langButtons) b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); };
+function setLang(next: Lang): void {
+  if (next === lang) return;
+  lang = next;
+  t = TEXTS[lang];
+  keepLang(lang);
+  applyTexts(lang);
+  showLang();
+  form.relabel(rows(schema as SchemaNode, lang), formTexts());
+  showCaption();
+  status.textContent = statusText();
+  presetStatus.textContent = presetText();
+  listPieces(shownParts);
+  stale = true;
+  sendCheck();
+  updateButtons();
+}
+for (const b of langButtons) b.addEventListener('click', () => setLang(b.dataset.lang as Lang));
+showLang();
 
 // Offline, built page only (MODE rather than PROD, false in the page built by the tests
 // under NODE_ENV=test); if the service worker cannot be installed, the page simply needs

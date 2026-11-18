@@ -14,14 +14,14 @@ const BARLOW = join(WEB, '../fonts/OFL-Barlow.txt');   // font of the legend and
 // Notes before a license: the sources of the LGPL WebAssembly build; the license of a
 // package that has no license file.
 const NOTES: Record<string, string> = {
-  'clipper-lib': 'Boost Software License 1.0, d\'après l\'en-tête de clipper.js (© Angus Johnson 2010-2017) : http://www.boost.org/LICENSE_1_0.txt',
-  'replicad-opencascadejs': 'Open CASCADE Technology (https://github.com/Open-Cascade-SAS/OCCT), compilé en WebAssembly par opencascade.js (https://github.com/donalffons/opencascade.js) ; sources de ce paquet : https://github.com/sgenoud/replicad/tree/main/packages/replicad-opencascadejs. Le .wasm est un fichier à part, remplaçable.',
+  'clipper-lib': 'Boost Software License 1.0, from the header of clipper.js (© Angus Johnson 2010-2017): http://www.boost.org/LICENSE_1_0.txt',
+  'replicad-opencascadejs': 'Open CASCADE Technology (https://github.com/Open-Cascade-SAS/OCCT), compiled to WebAssembly by opencascade.js (https://github.com/donalffons/opencascade.js); sources of this package: https://github.com/sgenoud/replicad/tree/main/packages/replicad-opencascadejs. The .wasm is a separate, replaceable file.',
 };
 
 interface Package { name: string; version: string; license?: string; dependencies?: Record<string, string> }
 
 // Packages the page runs on: the runtime dependencies of web/ and core/, and theirs, type
-// packages left out. Texts in French: the file is shown to the user.
+// packages left out. In English only, like the license texts it gathers.
 function licenses(): string {
   const found = new Map<string, string>();   // name → directory
   const visit = (dir: string) => {
@@ -42,12 +42,12 @@ function licenses(): string {
   const sections = [...found].filter(([name]) => !name.startsWith('@indicator/')).sort(([a], [b]) => a.localeCompare(b)).map(([name, dir]) => {
     const pkg: Package = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
     const file = readdirSync(dir).find((f) => /^(licen[cs]e|copying)/i.test(f));
-    const text = file ? readFileSync(join(dir, file), 'utf8').trim() : 'Pas de texte de licence dans le paquet.';
-    return [rule, `${name} ${pkg.version} : ${pkg.license ?? 'licence non indiquée'}`, rule, ...(NOTES[name] ? [NOTES[name], ''] : []), text].join('\n');
+    const text = file ? readFileSync(join(dir, file), 'utf8').trim() : 'No license text in the package.';
+    return [rule, `${name} ${pkg.version}: ${pkg.license ?? 'license not stated'}`, rule, ...(NOTES[name] ? [NOTES[name], ''] : []), text].join('\n');
   });
-  const barlow = [rule, 'Police Barlow Condensed (fonts/BarlowCondensed-SemiBold.ttf) : OFL-1.1', rule, readFileSync(BARLOW, 'utf8').trim()].join('\n');
+  const barlow = [rule, 'Barlow Condensed font (fonts/BarlowCondensed-SemiBold.ttf): OFL-1.1', rule, readFileSync(BARLOW, 'utf8').trim()].join('\n');
   // Byte order mark: read as UTF-8 even when served without a charset.
-  return '﻿' + ['Témoin lumineux : bibliothèques et polices de la page, avec leur licence.', ...sections, barlow].join('\n\n') + '\n';
+  return '﻿' + ['Panel indicator generator: libraries and fonts of the page, with their license.', ...sections, barlow].join('\n\n') + '\n';
 }
 
 function offline(): Plugin {
