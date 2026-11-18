@@ -16,12 +16,9 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import type { PreviewPart } from '@indicator/core';
 import { haloShare, intensity, mix, type Light } from './light.ts';
+import { EXPLODE, LIT_PART } from './layout3d.ts';
 
-// Offset of each piece along the depth when exploded (mm, towards the wall), as in
-// eclate.html.
-const EXPLODE: Record<string, number> = { cadre: -14, legende_masque: -7.5, legende_voile: -4.5, panneau_essai: 0, boite: 16, fond: 36 };
 const VIEWS = { iso: [-1, 0.55, 0.85], face: [0, 0.02, 1], side: [1, 0.18, 0.02], back: [0.75, 0.45, -1] } as const;
-const LIT_PART = 'legende_voile';
 // Halo of the lit veil: the blur of a bloom of the veil alone (selective bloom, as in
 // three.js' webgl_postprocessing_unreal_bloom_selective example), drawn with the other
 // pieces in black so that they still hide it, then added to the scene. No brightness
