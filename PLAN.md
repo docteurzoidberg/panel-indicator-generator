@@ -37,8 +37,8 @@ Steps are started one at a time, at the user's request.
 5. **Web page** *(done on 2026-10-31, branch `etape-5-web`)*: settings or opened preset (a host project's, for
    example), real-time preview (exploded or assembled, off
    or on) and downloads, in the browser, without a server.
-6. **English by default, new repository** *(decided on 2026-11-18; lots 6.1 to 6.5
-   done on 2026-11-18, 6.6 to do)*: the project moves to a new repository
+6. **English by default, new repository** *(decided and done on 2026-11-18; the
+   French repository to archive once the host projects have moved)*: the project moves to a new repository
    `panel-indicator-generator`, in US English, which becomes the
    reference; the French repository, `generateur-temoin-lumineux`, is kept
    for a while, then frozen. What stays in French: a version of the docs
@@ -79,9 +79,12 @@ Steps are started one at a time, at the user's request.
       example preset of lot 6.3 carried into the docs and the skill;
       a hook flags French docs behind their English
       version.
-   6. *Switch*: the French repository frozen, with a banner on its page that opens
-      the same preset in the new one; host projects move to the
-      new repository at their own pace; the French repository archived afterwards.
+   6. *Switch* (done on 2026-11-18): the French repository frozen, with a
+      banner on its page that opens the same preset in the new one and a
+      notice in its README; the `panel-indicator` skill linked to this
+      repository instead of the French one; host projects move to the new
+      repository at their own pace; the French repository archived
+      afterwards.
 
 Details of steps 3 to 5: [docs/generator-plan.md](docs/generator-plan.md).
 
