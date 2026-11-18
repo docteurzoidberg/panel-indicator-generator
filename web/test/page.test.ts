@@ -1,8 +1,8 @@
 // The page, built by Vite and opened in headless Chromium, against the indicator command: for
 // the same preset, same checks (indicator check) and same files (indicator generate), whether it
 // is typed in, opened, dropped or reopened from its link. One page for all cases: each
-// settings case then restores the alarme settings. Expected texts are the page's, in
-// French.
+// settings case then restores the alarm settings. Expected texts are the page's, in
+// French: its checks are the core's in French, with the codes and levels of the command.
 import { execFile, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -11,17 +11,20 @@ import { basename, join } from 'node:path';
 import { promisify } from 'node:util';
 import { unzipSync } from 'fflate';
 import { chromium, type Browser, type Page } from 'playwright-core';
-import { parsePreset, presetJson } from '@indicator/core';
+import { checkPreset, LEGEND, parseFont, parsePreset, presetJson } from '@indicator/core';
+import { stlStats } from '../../core/test/stl.ts';
 import { build, preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
 
 const WEB = new URL('..', import.meta.url).pathname;
 const BIN = new URL('../../cli/bin/indicator.ts', import.meta.url).pathname;
-const ALARM = new URL('../../presets/alarme.json', import.meta.url).pathname;
+const ALARM = new URL('../../presets/alarm.json', import.meta.url).pathname;
 const alarm = JSON.parse(readFileSync(ALARM, 'utf8'));
 const MARK = { ok: '✓', warn: '⚠', error: '✗' } as const;
 const sha = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 const runCli = (...args: string[]) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
+const fontBytes = readFileSync(new URL(`../../fonts/${LEGEND.fontFile}`, import.meta.url));
+const font = parseFont(fontBytes.buffer.slice(fontBytes.byteOffset, fontBytes.byteOffset + fontBytes.byteLength));
 
 // A preset where every key differs from the example, and an invalid preset.
 const PUMP = {
@@ -55,11 +58,12 @@ beforeAll(async () => {
   await page.goto(server.resolvedUrls!.local[0]);
 }, 60000);
 
+// Closing Chromium can take tens of seconds on a loaded machine.
 afterAll(async () => {
   await browser?.close();
   await server?.close();
   expect(errors).toEqual([]);   // no error in the page console
-});
+}, 60000);
 
 // Preset written to a temporary file, under this name.
 function presetFile(name: string, preset: object): string {
@@ -68,10 +72,38 @@ function presetFile(name: string, preset: object): string {
   return f;
 }
 
-// Lines of indicator check for a preset (object, or file).
+// What must be the same in a file of the page and of the command. OpenCascade may split a
+// flat quadrilateral along the other diagonal in the browser: meshes (STL, 3MF) are
+// compared by their geometry (vertices, triangle count, volume), the other files byte for
+// byte.
+function fingerprint(name: string, bytes: Uint8Array): unknown {
+  if (name.endsWith('.stl')) {
+    const b = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const n = b.getUint32(80, true), vertices = new Set<string>();
+    for (let i = 0; i < n; i++) {
+      for (let k = 0; k < 3; k++) vertices.add([0, 1, 2].map((j) => b.getFloat32(84 + i * 50 + 12 + k * 12 + j * 4, true)).join(' '));
+    }
+    return { triangles: n, vertices: sha(Buffer.from([...vertices].sort().join('\n'))), volume: stlStats(bytes).volume.toFixed(6) };
+  }
+  if (name.endsWith('.3mf')) {
+    const model = new TextDecoder().decode(unzipSync(bytes)['3D/3dmodel.model']).split('\n');
+    const mesh = (tag: string) => model.filter((l) => l.includes(`<${tag} `));
+    return {
+      rest: sha(Buffer.from(model.filter((l) => !/<(vertex|triangle) /.test(l)).join('\n'))),
+      triangles: mesh('triangle').length, vertices: sha(Buffer.from(mesh('vertex').sort().join('\n'))),
+    };
+  }
+  return sha(bytes);
+}
+
+// Check lines for a preset (object, or file): the core's in French, after making sure that
+// indicator check gives the same checks (codes and levels).
 function cliLines(preset: object | string): string[] {
   const f = typeof preset === 'string' ? preset : presetFile('sample.json', preset);
-  return JSON.parse(runCli('check', f, '--json').stdout).checks.map((c: { level: keyof typeof MARK; message: string }) => `${MARK[c.level]} ${c.message}`);
+  const checks = checkPreset(JSON.parse(readFileSync(f, 'utf8')), font, 'fr').checks;
+  const cli: { code: string; level: string }[] = JSON.parse(runCli('check', f, '--json').stdout).checks;
+  expect(cli.map((c) => `${c.code} ${c.level}`)).toEqual(checks.map((c) => `${c.code} ${c.level}`));
+  return checks.map((c) => `${MARK[c.level]} ${c.message}`);
 }
 
 const linesOf = (p: Page) => p.locator('#checks li').allTextContents();
@@ -98,7 +130,7 @@ async function dropFile(path: string): Promise<void> {
   await expect.poll(presetStatus).toBe(`Ouvert : ${basename(path)}`);
 }
 
-test('alarme: 3D view first, the six printed pieces of the core; checks of indicator check, mounting, front view', async () => {
+test('alarm: 3D view first, the six printed pieces of the core; checks of indicator check, mounting, front view', async () => {
   expect(await page.getByRole('button', { name: '3D', exact: true }).getAttribute('aria-pressed')).toBe('true');
   await expect.poll(() => page.locator('#stage3d').getAttribute('data-built'), { timeout: 60000 }).toBe('frame mask+veil box cover testPanel');
   expect(await page.locator('#stage3d canvas').count()).toBe(1);
@@ -163,24 +195,24 @@ test('number fields: the whole value in sight, up to 6 characters', async () => 
   await expect.poll(pageLines, { timeout: 10000 }).toEqual(cliLines(alarm));
 }, 30000);
 
-test('alarme: the page zip holds the files of indicator generate', async () => {
+test('alarm: the page zip holds the files of indicator generate (same geometry)', async () => {
   const cli = join(out, 'cli');
   const generated = promisify(execFile)(process.execPath, [BIN, 'generate', ALARM, '-o', cli]);   // at the same time as the page
   const button = page.getByRole('button', { name: 'Télécharger le zip' });
   await expect.poll(() => button.isEnabled(), { timeout: 30000 }).toBe(true);
   const [download] = await Promise.all([page.waitForEvent('download', { timeout: 60000 }), button.click()]);
-  expect(download.suggestedFilename()).toBe('alarme.zip');
+  expect(download.suggestedFilename()).toBe('alarm.zip');
   const zip = unzipSync(readFileSync(await download.path()));
 
   await generated;
-  const expected = Object.fromEntries(readdirSync(cli).sort().map((f) => [f, sha(readFileSync(join(cli, f)))]));
+  const expected = Object.fromEntries(readdirSync(cli).sort().map((f) => [f, fingerprint(f, new Uint8Array(readFileSync(join(cli, f))))]));
   expect(Object.keys(expected)).toHaveLength(12);
-  expect(Object.fromEntries(Object.entries(zip).map(([f, b]) => [f, sha(b)]))).toEqual(expected);
+  expect(Object.fromEntries(Object.entries(zip).map(([f, b]) => [f, fingerprint(f, b)]))).toEqual(expected);
 
   // Save: the preset as indicator generate writes it.
   const [saved] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Enregistrer' }).click()]);
-  expect(saved.suggestedFilename()).toBe('alarme.json');
-  expect(sha(readFileSync(await saved.path()))).toBe(expected['alarme.json']);
+  expect(saved.suggestedFilename()).toBe('alarm.json');
+  expect(sha(readFileSync(await saved.path()))).toBe(expected['alarm.json']);
 }, 120000);
 
 test('opened preset: checks of indicator check, file name, saved as is', async () => {
@@ -231,14 +263,14 @@ test('invalid preset, dropped: "path : message" errors of indicator check, kept 
   await expect.poll(pageLines, { timeout: 10000 }).toEqual(cliLines({ ...kept, legend: { ...INVALID.legend, text: 'Y' } }));
 }, 30000);
 
-test('alarme example: checks of indicator check, name derived from the text', async () => {
+test('alarm example: checks of indicator check, name derived from the text', async () => {
   await page.locator('#examples summary').click();
-  await page.getByRole('button', { name: 'alarme', exact: true }).click();
+  await page.getByRole('button', { name: 'alarm', exact: true }).click();
   expect(await page.locator('#examples').getAttribute('open')).toBeNull();
   await expect.poll(pageLines, { timeout: 10000 }).toEqual(cliLines(alarm));
-  expect(await presetStatus()).toBe('Exemple : alarme');
+  expect(await presetStatus()).toBe('Exemple : alarm');
   expect(await page.locator('#name').inputValue()).toBe('');
-  expect(await page.locator('#name').getAttribute('placeholder')).toBe('alarme');
+  expect(await page.locator('#name').getAttribute('placeholder')).toBe('alarm');
 }, 30000);
 
 test('3D view: only the legend rebuilt for a new text', async () => {
@@ -255,7 +287,7 @@ test('3D view: only the legend rebuilt for a new text', async () => {
   expect(await panel.getAttribute('aria-pressed')).toBe('true');
 
   await page.getByRole('button', { name: 'Face', exact: true }).click();
-  await page.getByLabel('Texte', { exact: true }).fill('ALARME');
+  await page.getByLabel('Texte', { exact: true }).fill('ALARM');
   await expect.poll(pageLines, { timeout: 10000 }).toEqual(cliLines(alarm));
 }, 90000);
 

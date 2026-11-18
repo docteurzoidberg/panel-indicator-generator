@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 
 const BIN = new URL('../bin/indicator.ts', import.meta.url).pathname;
-const ALARM = new URL('../../presets/alarme.json', import.meta.url).pathname;
+const ALARM = new URL('../../presets/alarm.json', import.meta.url).pathname;
 const run = (...args: string[]) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
 
 function presetFile(change: (p: any) => void): string {
@@ -19,22 +19,24 @@ function presetFile(change: (p: any) => void): string {
 }
 
 describe('indicator check', () => {
-  test('alarme: valid, hardware summary', () => {
+  test('alarm: valid, hardware summary', () => {
     const r = run('check', ALARM);
     expect(r.status).toBe(0);
-    expect(r.stdout).toContain('✓ vis M3 × 10 (tête fraisée, ISO 10642)');
-    expect(r.stdout).toContain('4 LED de ruban WS2812B à 144 LED/m');
+    expect(r.stdout).toContain('Indicator “alarm”');
+    expect(r.stdout).toContain('✓ M3 × 10 screws (countersunk head, ISO 10642)');
+    expect(r.stdout).toContain('  lighting: 4 WS2812B strip LEDs at 144 LEDs/m');
+    expect(r.stdout).toContain('  panel: cutout 29.8 × 13.3, 2 holes Ø 3.4, 37 mm apart');
   });
 
   test('--json for the skill', () => {
     const out = JSON.parse(run('check', ALARM, '--json').stdout);
-    expect(out).toMatchObject({ name: 'alarme', ok: true, summary: { screws: { length: 10 }, leds: { count: 4 }, cutout: { size: [29.8, 13.3], holes: { spacing: 37 } } } });
+    expect(out).toMatchObject({ name: 'alarm', ok: true, summary: { screws: { length: 10 }, leds: { count: 4 }, cutout: { size: [29.8, 13.3], holes: { spacing: 37 } } } });
   });
 
   test.each([
-    ['invalid preset', (p: any) => { p.mount.screw = 'M2.5'; }, '✗ mount : Clé non reconnue : "screw"'],
-    ['missing character', (p: any) => { p.legend.text = 'A☃B'; }, '✗ légende : caractères absents de la police : ☃'],
-    ['panel too thick', (p: any) => { p.panel.thickness = 30; }, '✗ aucune vis M3 du commerce ne convient pour un panneau de 30,0 mm'],
+    ['invalid preset', (p: any) => { p.mount.screw = 'M2.5'; }, '✗ mount: Unrecognized key: "screw"'],
+    ['missing character', (p: any) => { p.legend.text = 'A☃B'; }, '✗ legend: characters missing from the font: ☃'],
+    ['panel too thick', (p: any) => { p.panel.thickness = 30; }, '✗ no standard M3 screw fits a 30.0 mm panel'],
   ])('%s: exit code 1', (_, change, message) => {
     const r = run('check', presetFile(change));
     expect(r.status).toBe(1);
@@ -54,5 +56,5 @@ test('indicator generate: 12 files in export/ next to the preset', () => {
   expect(r.status, r.stderr).toBe(0);
   const dir = join(f, '..', 'export');
   expect(readdirSync(dir)).toHaveLength(12);
-  expect(readdirSync(dir)).toContain('sample_legende.3mf');
+  expect(readdirSync(dir)).toContain('sample_legend.3mf');
 }, 60000);

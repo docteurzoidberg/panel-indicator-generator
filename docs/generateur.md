@@ -150,7 +150,9 @@ Lots : [plan-generateur.md](plan-generateur.md), « Étape 5 ».
   `#name=claude&version=1&legend.text=CLAUDE&…&light.wireExit=left`, tenu à
   jour à chaque saisie.
 - **Télécharger** : les fichiers de `indicator generate` (voir « Sorties »),
-  identiques, en un zip ; calculés au clic.
+  en un zip ; calculés au clic. Preset et STEP identiques à ceux de la
+  commande ; STL et 3MF de même géométrie (OpenCascade peut couper un
+  quadrilatère plat par l'autre diagonale dans le navigateur).
 - **Thème** clair ou sombre : celui du système par défaut, bouton « Sombre »
   dans l'en-tête pour changer, choix gardé dans le navigateur.
 - **Hors ligne** une fois chargée (service worker de la page construite,

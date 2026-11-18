@@ -154,11 +154,23 @@ function fill(rings: Ring[]): InkPolygon[] {
   return [...polys.values()];
 }
 
-// Throws a message for the user (shown as a check line).
+// Legend that cannot be laid out: missing characters, or a text without ink; the checks
+// turn it into a message in the user's language.
+export class LegendError extends Error {
+  readonly reason: 'missingGlyphs' | 'noInk';
+  readonly chars: string[];
+  constructor(reason: 'missingGlyphs' | 'noInk', chars: string[] = []) {
+    super(reason === 'missingGlyphs' ? `characters missing from the font: ${chars.join(' ')}` : 'text without ink');
+    this.reason = reason;
+    this.chars = chars;
+  }
+}
+
+// Throws a LegendError when the text cannot be laid out.
 export function layoutLegend(text: string, font: Font, window: { width: number; height: number }): LegendLayout {
   const chars = [...text];
   const missing = [...new Set(chars.filter((ch) => font.charToGlyphIndex(ch) === 0))];
-  if (missing.length) throw new Error(`caractères absents de la police : ${missing.join(' ')}`);
+  if (missing.length) throw new LegendError('missingGlyphs', missing);
   const capEm = capHeightEm(font);
   let x = 0;
   const placed: [Glyph, number][] = [];
@@ -170,7 +182,7 @@ export function layoutLegend(text: string, font: Font, window: { width: number; 
     placed.push([g, x]);
     x += g.advanceWidth + LEGEND.tracking * capEm;
   }
-  if (!boxes.length) throw new Error('texte sans encre');
+  if (!boxes.length) throw new LegendError('noInk');
   const xmin = Math.min(...boxes.map((b) => b[0])), ymin = Math.min(...boxes.map((b) => b[1]));
   const xmax = Math.max(...boxes.map((b) => b[2])), ymax = Math.max(...boxes.map((b) => b[3]));
   const halfH = Math.max(ymax - capEm / 2, capEm / 2 - ymin);

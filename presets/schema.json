@@ -1,10 +1,10 @@
 {
-  "title": "Preset de témoin lumineux, v1",
+  "title": "Panel indicator preset, v1",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
     "$schema": {
-      "description": "Chemin ou URL du JSON Schema, pour les éditeurs",
+      "description": "Path or URL of the JSON Schema, for editors",
       "type": "string"
     },
     "version": {
@@ -17,11 +17,11 @@
         "text": {
           "type": "string",
           "pattern": "\\S",
-          "description": "Texte de la légende, sur une ligne"
+          "description": "Legend text, on one line"
         },
         "background": {
           "default": "#111111",
-          "description": "Couleur du fond de la légende (masque opaque) (#rrggbb) ; noir par défaut",
+          "description": "Color of the legend background (opaque mask) (#rrggbb); black by default",
           "type": "string",
           "pattern": "^#[0-9a-fA-F]{6}$"
         }
@@ -39,13 +39,13 @@
           "default": 27,
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Largeur de la fenêtre (partie visible de la légende) (mm)"
+          "description": "Window width (visible part of the legend) (mm)"
         },
         "height": {
           "default": 10.5,
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Hauteur de la fenêtre (mm)"
+          "description": "Window height (mm)"
         }
       },
       "additionalProperties": false
@@ -58,17 +58,17 @@
           "default": 47,
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Largeur du cadre (mm)"
+          "description": "Frame width (mm)"
         },
         "height": {
           "default": 18,
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Hauteur du cadre (mm)"
+          "description": "Frame height (mm)"
         },
         "color": {
           "default": "#111111",
-          "description": "Couleur du cadre (#rrggbb) ; noir par défaut",
+          "description": "Frame color (#rrggbb); black by default",
           "type": "string",
           "pattern": "^#[0-9a-fA-F]{6}$"
         }
@@ -81,7 +81,7 @@
         "thickness": {
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Épaisseur du panneau hôte (= longueur du tube) (mm)"
+          "description": "Thickness of the host panel (= length of the tube) (mm)"
         }
       },
       "required": [
@@ -95,7 +95,7 @@
       "properties": {
         "head": {
           "default": "countersunk",
-          "description": "Vis M3 et inserts à chaud ; countersunk : tête fraisée, socket : tête cylindrique (ISO 4762)",
+          "description": "M3 screws and heat-set inserts; countersunk: countersunk head, socket: socket head (ISO 4762)",
           "type": "string",
           "enum": [
             "countersunk",
@@ -111,7 +111,7 @@
       "properties": {
         "wireExit": {
           "default": "left",
-          "description": "Sortie des fils du ruban, vue de face",
+          "description": "Exit of the strip wires, seen from the front",
           "type": "string",
           "enum": [
             "left",
@@ -128,5 +128,5 @@
     "panel"
   ],
   "additionalProperties": false,
-  "description": "Preset d'un témoin lumineux (v1). Cotes en mm."
+  "description": "Panel indicator preset (v1). Dimensions in mm."
 }

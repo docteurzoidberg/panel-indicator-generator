@@ -1,6 +1,7 @@
-// Form fields: labels (shown to the user, in French) and rows of the page; type, default
-// value, required flag and options come from the published JSON Schema of the preset
-// (presets/schema.json, kept up to date by the core tests). A schema key without a row, or
+// Form fields: labels and hints (shown to the user, in French) and rows of the page; type,
+// default value, required flag and options come from the published JSON Schema of the
+// preset (presets/schema.json, kept up to date by the core tests), whose descriptions are in
+// English. A schema key without a row, or
 // the reverse, makes rows() fail: a setting added to the preset cannot be missing from the
 // page.
 export type Kind = 'text' | 'number' | 'color' | 'select';
@@ -25,6 +26,24 @@ const LABELS: Record<string, string> = {
 };
 const OPTIONS: Record<string, string> = {
   countersunk: 'fraisée', socket: 'cylindrique', left: 'à gauche', right: 'à droite',
+};
+// Hints of the fields (the schema's descriptions, in French).
+const HINTS: Record<string, string> = {
+  'legend.text': 'Texte de la légende, sur une ligne',
+  'legend.background': 'Couleur du fond de la légende (masque opaque) (#rrggbb) ; noir par défaut',
+  'window.width': 'Largeur de la fenêtre (partie visible de la légende) (mm)',
+  'window.height': 'Hauteur de la fenêtre (mm)',
+  'frame.width': 'Largeur du cadre (mm)',
+  'frame.height': 'Hauteur du cadre (mm)',
+  'frame.color': 'Couleur du cadre (#rrggbb) ; noir par défaut',
+  'panel.thickness': 'Épaisseur du panneau hôte (= longueur du tube) (mm)',
+  'mount.head': 'Vis M3 et inserts à chaud ; countersunk : tête fraisée, socket : tête cylindrique (ISO 4762)',
+  'light.wireExit': 'Sortie des fils du ruban, vue de face',
+};
+// Printed pieces, by the core's name (pieceInfo).
+export const PIECES: Record<string, string> = {
+  frame: 'cadre', legend_mask: 'masque', legend_veil: 'lettres et voile', box: 'boîte', cover: 'fond',
+  test_panel: "panneau d'essai (au choix)",
 };
 const SKIP = new Set(['$schema', 'version']);   // set by the page
 
@@ -64,7 +83,7 @@ export function rows(schema: SchemaNode): Row[] {
         path, label: LABELS[path] ?? label, kind: kind(n), required: n.required,
         default: n.default as string | number | undefined,
         options: n.enum?.map((v) => [v, OPTIONS[v] ?? v] as [string, string]),
-        hint: n.description,
+        hint: HINTS[path] ?? n.description,
       };
     }),
   }));

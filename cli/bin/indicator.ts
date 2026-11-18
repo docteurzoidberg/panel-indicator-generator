@@ -3,16 +3,15 @@
 //   indicator check <preset.json> [--json]
 //   indicator generate <preset.json> [-o <dir>] [--json]
 // <dir>: export/ next to the preset by default; preset <name> = name of the files.
-// Exit code: 0 valid, 1 preset error, 2 bad usage. Output is for the user: it stays in
-// French.
+// Exit code: 0 valid, 1 preset error, 2 bad usage. Output in English.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { checkPreset, generate, LEGEND, parseFont, summaryLines, type CheckResult } from '@indicator/core';
 import { initOC } from '@indicator/core/occ-node';
 
-const USAGE = `usage : indicator check <preset.json> [--json]
-        indicator generate <preset.json> [-o <dossier>] [--json]`;
+const USAGE = `usage: indicator check <preset.json> [--json]
+       indicator generate <preset.json> [-o <dir>] [--json]`;
 
 function fail(message: string, code = 2): never {
   console.error(message);
@@ -36,7 +35,7 @@ let data: unknown;
 try {
   data = JSON.parse(readFileSync(presetPath, 'utf8'));
 } catch (e) {
-  fail(`${presetArg} : ${(e as Error).message}`, 1);
+  fail(`${presetArg}: ${(e as Error).message}`, 1);
 }
 const fontBytes = readFileSync(new URL(`../../fonts/${LEGEND.fontFile}`, import.meta.url));
 const font = parseFont(fontBytes.buffer.slice(fontBytes.byteOffset, fontBytes.byteOffset + fontBytes.byteLength));
@@ -48,10 +47,10 @@ function report(result: CheckResult, written?: { dir: string; files: string[] })
     console.log(JSON.stringify({ name, ok: result.ok, checks: result.checks, summary: result.summary, ...(written ? { out: written.dir, files: written.files } : {}) }, null, 2));
     return;
   }
-  console.log(`Témoin « ${name} » (${shown(presetPath)})`);
+  console.log(`Indicator “${name}” (${shown(presetPath)})`);
   for (const c of result.checks) console.log(`${c.level === 'ok' ? '✓' : c.level === 'warn' ? '⚠' : '✗'} ${c.message}`);
-  if (result.summary) for (const [label, text] of summaryLines(result.summary)) console.log(`  ${label} : ${text}`);
-  if (written) console.log(`Fichiers (${written.files.length}) : ${shown(written.dir)}/\n  ${written.files.join('\n  ')}`);
+  if (result.summary) for (const [label, text] of summaryLines(result.summary)) console.log(`  ${label}: ${text}`);
+  if (written) console.log(`Files (${written.files.length}): ${shown(written.dir)}/\n  ${written.files.join('\n  ')}`);
 }
 
 if (command === 'check') {

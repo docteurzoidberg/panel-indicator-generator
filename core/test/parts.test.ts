@@ -15,7 +15,7 @@ const bytes = readFileSync(file(`fonts/${LEGEND.fontFile}`));
 const font = parseFont(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
 
 function preset(change: (p: any) => void = () => {}): Preset {
-  const p = JSON.parse(readFileSync(file('presets/alarme.json'), 'utf8'));
+  const p = JSON.parse(readFileSync(file('core/test/ref/alarme.json'), 'utf8'));
   change(p);
   const r = parsePreset(p);
   if (!r.ok) throw new Error(r.errors.join('\n'));

@@ -7,7 +7,8 @@
 //   color, without any slicer setting;
 // - <name>.step: named and colored assembly, in the indicator frame, for integration;
 // - <name>.json: the preset used, default values included.
-// Part names and labels end up in file names and slicers: they stay in French.
+// Part names and labels end up in file names and slicers: they are in English, whatever
+// the language of the messages.
 import { strToU8, zipSync } from 'fflate';
 import { exportSTEP, type Shape3D } from 'replicad';
 import type { Parts } from './parts.ts';
@@ -26,12 +27,12 @@ interface Piece extends PieceInfo { shape: Shape3D }
 // and color; the preview shows the same ones.
 export function pieceInfo(p: Preset): PieceInfo[] {
   return [
-    { name: 'cadre', label: 'cadre', part: 'frame', side: 'face', group: 'cadre', color: p.frame.color },
-    { name: 'legende_masque', label: 'masque', part: 'mask', side: 'face', group: 'legende', color: p.legend.background },
-    { name: 'legende_voile', label: 'lettres et voile', part: 'veil', side: 'face', group: 'legende', color: WHITE },
-    { name: 'boite', label: 'boîte', part: 'box', side: 'back', group: 'boite', color: BLACK },
-    { name: 'fond', label: 'fond', part: 'cover', side: 'back', group: 'fond', color: BLACK },
-    { name: 'panneau_essai', label: "panneau d'essai (au choix)", part: 'testPanel', side: 'face', group: 'panneau_essai', color: FREE },
+    { name: 'frame', label: 'frame', part: 'frame', side: 'face', group: 'frame', color: p.frame.color },
+    { name: 'legend_mask', label: 'mask', part: 'mask', side: 'face', group: 'legend', color: p.legend.background },
+    { name: 'legend_veil', label: 'letters and veil', part: 'veil', side: 'face', group: 'legend', color: WHITE },
+    { name: 'box', label: 'box', part: 'box', side: 'back', group: 'box', color: BLACK },
+    { name: 'cover', label: 'cover', part: 'cover', side: 'back', group: 'cover', color: BLACK },
+    { name: 'test_panel', label: 'test panel (optional)', part: 'testPanel', side: 'face', group: 'test_panel', color: FREE },
   ];
 }
 
@@ -39,10 +40,10 @@ const pieces = (p: Preset, parts: Parts): Piece[] => pieceInfo(p).map((info) => 
 
 // 3MF prints: objects, each made of one or more parts (one per color).
 const JOBS: Record<string, [string, string[]][]> = {
-  legende: [['legende', ['legende_masque', 'legende_voile']]],
-  boite_fond: [['boite', ['boite']], ['fond', ['fond']]],
-  cadre: [['cadre', ['cadre']]],
-  panneau_essai: [['panneau_essai', ['panneau_essai']]],
+  legend: [['legend', ['legend_mask', 'legend_veil']]],
+  box_cover: [['box', ['box']], ['cover', ['cover']]],
+  frame: [['frame', ['frame']]],
+  test_panel: [['test_panel', ['test_panel']]],
 };
 const PLATE_CENTER = [100, 100];   // assumed bed center (mm), to rearrange when slicing
 const GAP = 5;                     // gap between the objects of a print (mm)
@@ -150,7 +151,7 @@ function threeMf(title: string, objects: [string, { label: string; color: string
     return item;
   });
   const bases = mats.map((m) => { const [label, color] = m.split('|'); return `   <base name="${esc(label)}" displaycolor="${color.toUpperCase()}FF"/>`; });
-  const model = `<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="fr-FR" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">\n`
+  const model = `<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">\n`
     + ` <metadata name="Title">${esc(title)}</metadata>\n <metadata name="Application">panel-indicator-generator</metadata>\n`
     + ` <resources>\n  <basematerials id="1">\n${bases.join('\n')}\n  </basematerials>\n${res.join('\n')}\n </resources>\n`
     + ` <build>\n${items.join('\n')}\n </build>\n</model>\n`;
@@ -194,8 +195,8 @@ function stableStyles(text: string): string {
 }
 
 async function step(name: string, list: Piece[]): Promise<Uint8Array> {
-  const shapes = list.filter((p) => p.name !== 'panneau_essai')
-    .map((p) => ({ shape: p.shape, name: p.name.replace('legende_', ''), color: linear(p.color) }));
+  const shapes = list.filter((p) => p.name !== 'test_panel')
+    .map((p) => ({ shape: p.shape, name: p.name.replace('legend_', ''), color: linear(p.color) }));
   const text = new TextDecoder().decode(await exportSTEP(shapes).arrayBuffer());
   // Header without date or temporary file name.
   return strToU8(stableStyles(text).replace(/FILE_NAME\('[^']*','[^']*'/, `FILE_NAME('${name}','1980-01-01T00:00:00'`));

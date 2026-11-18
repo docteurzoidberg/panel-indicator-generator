@@ -7,13 +7,13 @@ import { rows, type SchemaNode } from '../src/fields.ts';
 import { fromHash, toHash } from '../src/link.ts';
 
 const layout = rows(presetJsonSchema() as SchemaNode);
-const { $schema, ...alarm } = JSON.parse(readFileSync(new URL('../../presets/alarme.json', import.meta.url), 'utf8'));
+const { $schema, ...alarm } = JSON.parse(readFileSync(new URL('../../presets/alarm.json', import.meta.url), 'utf8'));
 
-test('alarme: same preset and same name after the link, without $schema', () => {
-  const hash = toHash({ $schema, ...alarm }, 'alarme');
+test('alarm: same preset and same name after the link, without $schema', () => {
+  const hash = toHash({ $schema, ...alarm }, 'alarm');
   expect(hash).not.toContain('schema');
   expect(hash).toContain('frame.width=47&frame.height=18&frame.color=%234b5320');
-  expect(fromHash(`#${hash}`, layout)).toEqual({ preset: alarm, name: 'alarme' });
+  expect(fromHash(`#${hash}`, layout)).toEqual({ preset: alarm, name: 'alarm' });
 });
 
 test('any text, no name', () => {

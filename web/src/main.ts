@@ -2,9 +2,9 @@
 // on every input (checks worker); 3D preview (shown first) after a pause in typing, and
 // files on download (OpenCascade worker, engine.ts); simulated light of the legend.
 // Presets: opened (picked or dropped on the page), examples from presets/, saved, and
-// carried by the page link. On load: the preset of the link, else the alarme example.
+// carried by the page link. On load: the preset of the link, else the alarm example.
 // Offline once loaded, built page only (service worker, src/sw.js). Texts shown to the
-// user are in French (i18n labels later).
+// user are in French (lang.ts) for now.
 import '@fontsource/b612/400.css';
 import '@fontsource/b612/700.css';
 import '@fontsource/b612-mono/400.css';
@@ -14,7 +14,7 @@ import type { PreviewPart } from '@indicator/core';
 import { createEngine } from './engine-client.ts';
 import { drawFace, lightFace } from './face.ts';
 import type { FaceModel } from './face-model.ts';
-import { rows, type SchemaNode } from './fields.ts';
+import { PIECES, rows, type SchemaNode } from './fields.ts';
 import { createForm } from './form.ts';
 import { animated, intensity, type Effect, type Light } from './light.ts';
 import { fromHash, toHash } from './link.ts';
@@ -38,7 +38,7 @@ const stage3d = $('#stage3d'), controls3d = $('#controls3d'), piecesList = $('#p
 const downloadButton = $<HTMLButtonElement>('#download'), saveButton = $<HTMLButtonElement>('#save');
 const fileInput = $<HTMLInputElement>('#file'), examples = $<HTMLDetailsElement>('#examples'), drop = $('#drop');
 
-// Name of the files: the one typed in (or the opened preset's), else derived from the text ("ALARME" → alarme).
+// Name of the files: the one typed in (or the opened preset's), else derived from the text ("ALARM" → alarm).
 const slug = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
   .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'indicator';
 const fileName = () => nameInput.value.trim().replace(/[\s\\/:*?"<>|]+/g, '-') || nameInput.placeholder;
@@ -203,7 +203,7 @@ function listPieces(parts: PreviewPart[]): void {
     button.setAttribute('aria-pressed', String(!hidden.has(p.name)));
     const swatch = item('span', 'swatch', '');
     swatch.style.background = p.color;
-    button.append(swatch, p.label);
+    button.append(swatch, PIECES[p.name] ?? p.label);
     button.addEventListener('click', () => {
       const show = hidden.has(p.name);
       if (show) hidden.delete(p.name); else hidden.add(p.name);
@@ -376,7 +376,7 @@ function openLink(): boolean {
   return !!linked;
 }
 addEventListener('hashchange', openLink);   // link pasted in the address bar of the open page
-if (!openLink()) load(JSON.parse(EXAMPLES.alarme), '', 'Exemple : alarme');
+if (!openLink()) load(JSON.parse(EXAMPLES.alarm), '', 'Exemple : alarm');
 
 // Offline, built page only (MODE rather than PROD, false in the page built by the tests
 // under NODE_ENV=test); if the service worker cannot be installed, the page simply needs

@@ -14,7 +14,7 @@ const bytes = readFileSync(file(`fonts/${LEGEND.fontFile}`));
 const font = parseFont(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
 
 function preset(change: (p: any) => void = () => {}): Preset {
-  const p = JSON.parse(readFileSync(file('presets/alarme.json'), 'utf8'));
+  const p = JSON.parse(readFileSync(file('core/test/ref/alarme.json'), 'utf8'));
   change(p);
   const r = parsePreset(p);
   if (!r.ok) throw new Error(r.errors.join('\n'));
@@ -39,8 +39,8 @@ describe('alarme', () => {
   beforeAll(() => { result = preview(preset()); }, 60000);
 
   test('the printed pieces, in assembly order, with their label and color', () => {
-    expect(result.parts.map((p) => p.name)).toEqual(['cadre', 'legende_masque', 'legende_voile', 'boite', 'fond', 'panneau_essai']);
-    expect(result.parts[0]).toMatchObject({ label: 'cadre', color: '#4b5320' });
+    expect(result.parts.map((p) => p.name)).toEqual(['frame', 'legend_mask', 'legend_veil', 'box', 'cover', 'test_panel']);
+    expect(result.parts[0]).toMatchObject({ label: 'frame', color: '#4b5320' });
     expect(result.built).toEqual(['frame', 'mask+veil', 'box', 'cover', 'testPanel']);
   });
 

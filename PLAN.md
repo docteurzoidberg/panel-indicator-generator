@@ -37,7 +37,7 @@ Les étapes se lancent une à une, à la demande de l'utilisateur.
 5. **Page web** *(fait le 31/10/2026, branche `etape-5-web`)* : réglages ou preset ouvert (celui d'un projet hôte, par
    exemple), aperçu en temps réel (éclaté ou assemblé, éteint
    ou allumé) et téléchargements, dans le navigateur, sans serveur.
-6. **Anglais par défaut, nouveau dépôt** *(décidée le 18/11/2026 ; lots 6.1 et 6.2
+6. **Anglais par défaut, nouveau dépôt** *(décidée le 18/11/2026 ; lots 6.1 à 6.3
    faits le 18/11/2026)* : le projet passe dans un nouveau dépôt
    `panel-indicator-generator`, en anglais américain, qui devient la
    référence ; ce dépôt-ci, en français, est gardé un temps puis gelé. En
@@ -51,13 +51,19 @@ Les étapes se lancent une à une, à la demande de l'utilisateur.
       ligne ; orthographe américaine partout (`color`, `license`,
       `center`, `licenses.txt`), sauf les identifiants d'API externes
       (`organiseBlueprints` de replicad).
-   3. *Noyau et commande* : messages renvoyés en code + paramètres, avec un
-      catalogue en/fr dans `core` (contrôles, résumé, erreurs du preset) ;
-      nombres formatés selon la langue ; JSON Schema en anglais ; noms des
+   3. *Noyau et commande* : messages dans la langue demandée (anglais par
+      défaut), catalogue en/fr dans `core/src/messages.ts` (contrôles,
+      résumé, erreurs du preset) ; nombres formatés selon la langue ; la
+      page reste en français jusqu'au lot 6.4 (libellés des pièces et aides
+      des champs passés côté page) ; JSON Schema en anglais ; noms des
       fichiers produits en anglais, fixes quelle que soit la langue ;
       sortie de la commande en anglais ; la référence de test (preset
       ALARME de la maquette) séparée du preset d'exemple, qui passe en
-      anglais. Clés du preset inchangées : il reste en v1.
+      anglais (`presets/alarm.json`, ALARM). Clés du preset inchangées : il
+      reste en v1. Zip de la page et fichiers de la commande : preset et
+      STEP identiques, STL et 3MF de même géométrie (OpenCascade peut
+      couper un quadrilatère plat par l'autre diagonale dans le navigateur ;
+      vu avec ALARM, décidé le 18/11/2026).
    4. *Page multilingue* : anglais par défaut, français au choix ; langue
       du navigateur, choix dans l'en-tête retenu par la page ; format des
       liens de partage inchangé ; tests de la page en anglais et en
@@ -65,6 +71,9 @@ Les étapes se lancent une à une, à la demande de l'utilisateur.
    5. *Docs* : anglais à leur place ; version française du README, de
       `generateur.md` et de `skill.md` (`README.fr.md`, `docs/fr/`) ; les
       journaux (`PLAN.md`, `plan-generateur.md`) en anglais seulement ;
+      presets des projets hôtes dans `design/indicator/` (au lieu de
+      `design/temoin/`, décidé le 18/11/2026) ; noms des fichiers produits et
+      preset d'exemple du lot 6.3 repris dans les docs et le skill ;
       un hook signale les docs françaises en retard sur leur version
       anglaise.
    6. *Bascule* : ce dépôt-ci gelé, avec un bandeau sur sa page qui ouvre

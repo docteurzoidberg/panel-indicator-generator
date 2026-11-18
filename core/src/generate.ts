@@ -3,7 +3,8 @@
 import type { Font } from 'opentype.js/dist/opentype.mjs';
 import { parsePreset, type Preset } from './preset.ts';
 import { dimensions, M3, screwLength, STRIP, type Dimensions } from './dims.ts';
-import { layoutLegend, type LegendLayout } from './legend.ts';
+import { layoutLegend, LegendError, type LegendLayout } from './legend.ts';
+import { decimal, MESSAGES, short, type Lang } from './messages.ts';
 import { buildParts } from './parts.ts';
 import { exportFiles } from './exports.ts';
 import { legendChecks, lightChecks, mountChecks, type Check } from './checks.ts';
@@ -30,31 +31,33 @@ export interface CheckResult {
   summary?: Summary;
 }
 
-const mm = (v: number, digits = 2) => v.toFixed(digits).replace('.', ',');
 const um = (v: number) => Math.round(v * 1000) / 1000;   // summary dimensions, to the µm
 
-// Checks a preset (JSON already read); stops at the first family of errors. Dimensions
-// and legend are returned as soon as the preset is valid, even if mounting fails
-// (preview).
-export function checkPreset(data: unknown, font: Font): CheckResult & { dims?: Dimensions; layout?: LegendLayout } {
-  const r = parsePreset(data);
+// Checks a preset (JSON already read), messages in the language; stops at the first family
+// of errors. Dimensions and legend are returned as soon as the preset is valid, even if
+// mounting fails (preview).
+export function checkPreset(data: unknown, font: Font, lang: Lang = 'en'): CheckResult & { dims?: Dimensions; layout?: LegendLayout } {
+  const t = MESSAGES[lang], mm = (v: number, digits = 2) => decimal(lang, v, digits);
+  const r = parsePreset(data, lang);
   if (!r.ok) return { ok: false, checks: r.errors.map((message) => ({ level: 'error', code: 'preset', message })) };
   const preset = r.preset, d = dimensions(preset);
   const checks: Check[] = [];
   let layout: LegendLayout | undefined;
   try {
     layout = layoutLegend(preset.legend.text, font, { width: d.windowW, height: d.windowH });
-    checks.push({ level: 'ok', code: 'legend', message: `légende « ${preset.legend.text} » : capitales de ${mm(layout.capHeight)} mm, à ${mm(layout.room)} mm du bord de la fenêtre` });
-    checks.push(...legendChecks(d, layout));
+    checks.push({ level: 'ok', code: 'legend', message: t.legend(preset.legend.text, mm(layout.capHeight), mm(layout.room)) });
+    checks.push(...legendChecks(d, layout, lang));
   } catch (e) {
-    checks.push({ level: 'error', code: 'legend', message: `légende : ${(e as Error).message}` });
+    if (!(e instanceof LegendError)) throw e;
+    const why = e.reason === 'missingGlyphs' ? t.missingGlyphs(e.chars.join(' ')) : t.noInk;
+    checks.push({ level: 'error', code: 'legend', message: t.legendError(why) });
   }
-  checks.push(...mountChecks(d));
+  checks.push(...mountChecks(d, lang));
   const length = screwLength(d);
   checks.push(length === null
-    ? { level: 'error', code: 'screw', message: `aucune vis M3 du commerce ne convient pour un panneau de ${mm(d.panelT, 1)} mm` }
-    : { level: 'ok', code: 'screw', message: `vis M3 × ${length} (${preset.mount.head === 'countersunk' ? 'tête fraisée, ISO 10642' : 'tête cylindrique, ISO 4762'})` });
-  checks.push(...lightChecks(d));
+    ? { level: 'error', code: 'screw', message: t.noScrew(mm(d.panelT, 1)) }
+    : { level: 'ok', code: 'screw', message: t.screw(length, preset.mount.head) });
+  checks.push(...lightChecks(d, lang));
   const ok = checks.every((c) => c.level !== 'error');
   if (!ok || !layout || length === null) return { ok, checks, preset, dims: d, layout };
   const summary: Summary = {
@@ -69,21 +72,19 @@ export function checkPreset(data: unknown, font: Font): CheckResult & { dims?: D
 }
 
 // Files of the indicator <name> (file name, bytes); OpenCascade must be started.
-export async function generate(name: string, data: unknown, font: Font): Promise<CheckResult & { files?: Record<string, Uint8Array> }> {
-  const { dims, layout, ...result } = checkPreset(data, font);
+export async function generate(name: string, data: unknown, font: Font, lang: Lang = 'en'): Promise<CheckResult & { files?: Record<string, Uint8Array> }> {
+  const { dims, layout, ...result } = checkPreset(data, font, lang);
   if (!result.ok || !dims || !layout || !result.preset) return result;
   return { ...result, files: await exportFiles(name, result.preset, buildParts(dims, layout)) };
 }
 
-const n = (v: number) => v.toFixed(1).replace('.', ',').replace(/,0+$/, '');
-
 // Summary as lines (label, text), the same in the command line and the page.
-export function summaryLines(s: Summary): [string, string][] {
-  const head = s.screws.head === 'countersunk' ? 'fraisées (ISO 10642)' : 'à tête cylindrique (ISO 4762)';
+export function summaryLines(s: Summary, lang: Lang = 'en'): [string, string][] {
+  const t = MESSAGES[lang].summary, n = (v: number) => short(lang, v);
   return [
-    ['vis', `${s.screws.count} vis ${s.screws.size} × ${s.screws.length} ${head}, ${s.inserts.count} inserts à chaud ${s.inserts.size} (perçage Ø ${n(s.inserts.hole[0])} × ${n(s.inserts.hole[1])})`],
-    ['éclairage', `${s.leds.count} LED de ruban WS2812B à ${s.leds.ledsPerMeter} LED/m (tronçon de ${n(s.leds.stripLength)} mm), fils à ${s.leds.wireExit === 'left' ? 'gauche' : 'droite'}, nappe de 4 fils au pas de 1,27`],
-    ['cotes', `fenêtre ${n(s.window[0])} × ${n(s.window[1])}, cadre ${n(s.frame[0])} × ${n(s.frame[1])}, panneau de ${n(s.panel)} mm`],
-    ['panneau', `découpe ${n(s.cutout.size[0])} × ${n(s.cutout.size[1])}, ${s.cutout.holes.count} trous Ø ${n(s.cutout.holes.diameter)} à ${n(s.cutout.holes.spacing)} d'entraxe, centrés sur la fenêtre`],
+    t.screws(s.screws.count, s.screws.size, s.screws.length, s.screws.head, s.inserts.count, [n(s.inserts.hole[0]), n(s.inserts.hole[1])]),
+    t.lighting(s.leds.count, s.leds.ledsPerMeter, n(s.leds.stripLength), s.leds.wireExit),
+    t.dimensions([n(s.window[0]), n(s.window[1])], [n(s.frame[0]), n(s.frame[1])], n(s.panel)),
+    t.panel([n(s.cutout.size[0]), n(s.cutout.size[1])], s.cutout.holes.count, n(s.cutout.holes.diameter), n(s.cutout.holes.spacing)),
   ];
 }

@@ -1,6 +1,8 @@
 export { presetSchema, parsePreset, presetJson, presetJsonSchema } from './preset.ts';
 export type { Preset, PresetInput, ParseResult } from './preset.ts';
-export { LEGEND, parseFont, layoutLegend, ringArea } from './legend.ts';
+export { LEGEND, LegendError, parseFont, layoutLegend, ringArea } from './legend.ts';
+export { LANGS, MESSAGES, decimal } from './messages.ts';
+export type { Lang, Messages } from './messages.ts';
 export type { LegendLayout, InkPolygon, Ring, Point } from './legend.ts';
 export { dimensions, screwLength, M3, STRIP, SCREW_LENGTHS } from './dims.ts';
 export type { Dimensions } from './dims.ts';

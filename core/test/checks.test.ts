@@ -10,10 +10,11 @@ const bytes = readFileSync(file(`fonts/${LEGEND.fontFile}`));
 const font = parseFont(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
 const mockup = JSON.parse(readFileSync(file('core/test/ref/alarme_legende.json'), 'utf8'));
 
-function check(change: (p: any) => void = () => {}) {
-  const p = JSON.parse(readFileSync(file('presets/alarme.json'), 'utf8'));
+// In French, like the mock-up's messages (ref/alarme_legende.json) they are compared with.
+function check(change: (p: any) => void = () => {}, lang: 'en' | 'fr' = 'fr') {
+  const p = JSON.parse(readFileSync(file('core/test/ref/alarme.json'), 'utf8'));
   change(p);
-  return checkPreset(p, font);
+  return checkPreset(p, font, lang);
 }
 const by = (checks: Check[], code: string) => checks.find((c) => c.code === code)!;
 const levels = (checks: Check[], level: Check['level']) => checks.filter((c) => c.level === level).map((c) => c.code);
@@ -75,4 +76,14 @@ test('end LEDs outside the window: warning', () => {
   const r = check((p) => { p.window.width = 24.4; });
   expect(by(r.checks, 'light.leds').level).toBe('warn');
   expect(r.ok).toBe(true);
+});
+
+test('English by default: same checks, decimal point', () => {
+  const p = JSON.parse(readFileSync(file('core/test/ref/alarme.json'), 'utf8'));
+  const en = checkPreset(p, font), fr = check();
+  expect(en.checks.map((c) => [c.code, c.level])).toEqual(fr.checks.map((c) => [c.code, c.level]));
+  expect(by(en.checks, 'legend.strokes').message).toBe('strokes thinner than the nozzle (0.4 mm): none');
+  expect(by(en.checks, 'mount.overlap').message).toBe('the frame overlaps the cutout by 2.35 mm (at least 1.5)');
+  expect(by(en.checks, 'screw').message).toBe('M3 × 10 screws (countersunk head, ISO 10642)');
+  expect(by(en.checks, 'light.leds').message).toBe('4 LEDs in the window');
 });

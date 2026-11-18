@@ -82,6 +82,6 @@ describe('layout', () => {
   });
 
   test('character missing from the font', () => {
-    expect(() => layoutLegend('A☃B', font, WINDOW)).toThrow('caractères absents de la police : ☃');
+    expect(() => layoutLegend('A☃B', font, WINDOW)).toThrow('characters missing from the font: ☃');
   });
 });
